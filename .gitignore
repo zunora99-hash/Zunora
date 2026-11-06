@@ -1,0 +1,9 @@
+.next
+node_modules
+dist
+.env
+.env.local
+.vercel
+coverage
+*.log
+public/uploads

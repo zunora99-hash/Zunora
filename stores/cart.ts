@@ -1,0 +1,82 @@
+"use client";
+
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { CatalogProduct, CatalogVariant } from "@/lib/catalog";
+
+export type CartItem = {
+  productId: string;
+  variantId: string;
+  slug: string;
+  name: string;
+  image: string;
+  variant: string;
+  price: number;
+  mrp: number;
+  quantity: number;
+};
+
+type CartState = {
+  items: CartItem[];
+  drawerOpen: boolean;
+  addItem: (product: CatalogProduct, variant: CatalogVariant, quantity?: number) => void;
+  removeItem: (variantId: string) => void;
+  updateQuantity: (variantId: string, quantity: number) => void;
+  clear: () => void;
+  setDrawerOpen: (open: boolean) => void;
+};
+
+export const useCartStore = create<CartState>()(
+  persist(
+    (set) => ({
+      items: [],
+      drawerOpen: false,
+      addItem: (product, variant, quantity = 1) =>
+        set((state) => {
+          const existing = state.items.find((item) => item.variantId === variant.id);
+          if (existing) {
+            return {
+              drawerOpen: true,
+              items: state.items.map((item) =>
+                item.variantId === variant.id ? { ...item, quantity: item.quantity + quantity } : item
+              )
+            };
+          }
+          return {
+            drawerOpen: true,
+            items: [
+              ...state.items,
+              {
+                productId: product.id,
+                variantId: variant.id,
+                slug: product.slug,
+                name: product.name,
+                image: product.images[0],
+                variant: variant.label,
+                price: variant.price,
+                mrp: variant.mrp,
+                quantity
+              }
+            ]
+          };
+        }),
+      removeItem: (variantId) =>
+        set((state) => ({ items: state.items.filter((item) => item.variantId !== variantId) })),
+      updateQuantity: (variantId, quantity) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.variantId === variantId ? { ...item, quantity: Math.max(1, quantity) } : item
+          )
+        })),
+      clear: () => set({ items: [] }),
+      setDrawerOpen: (drawerOpen) => set({ drawerOpen })
+    }),
+    { name: "nutrinest-cart" }
+  )
+);
+
+export function getCartTotals(items: CartItem[]) {
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  return { subtotal, count };
+}

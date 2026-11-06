@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 42 64% 95%;
+    --foreground: 24 44% 16%;
+    --card: 42 60% 98%;
+    --card-foreground: 24 44% 16%;
+    --popover: 42 60% 98%;
+    --popover-foreground: 24 44% 16%;
+    --primary: 24 44% 16%;
+    --primary-foreground: 42 64% 95%;
+    --secondary: 75 31% 33%;
+    --secondary-foreground: 42 64% 95%;
+    --muted: 40 36% 88%;
+    --muted-foreground: 25 18% 38%;
+    --accent: 38 73% 49%;
+    --accent-foreground: 24 44% 16%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 42 64% 95%;
+    --border: 35 30% 82%;
+    --input: 35 30% 78%;
+    --ring: 38 73% 49%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  ::selection {
+    background: #d89822;
+    color: #3d2618;
+  }
+}
+
+@layer components {
+  .section {
+    @apply py-14 md:py-20;
+  }
+
+  .eyebrow {
+    @apply text-xs font-bold uppercase tracking-[0.18em] text-olive;
+  }
+}
