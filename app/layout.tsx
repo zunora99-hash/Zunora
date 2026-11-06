@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { CookieConsent } from "@/components/layout/cookie-consent";
 import { Toaster } from "@/components/ui/toast";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import "./globals.css";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Footer />
           <CartDrawer />
           <MobileNav />
+          <CookieConsent />
           <Toaster />
         </AuthProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }} />

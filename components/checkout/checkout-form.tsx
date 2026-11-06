@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { MapPin } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,6 +24,22 @@ function collectErrorMessages(value: unknown): string[] {
   if (!value || typeof value !== "object") return [];
   if ("message" in value && typeof value.message === "string") return [value.message];
   return Object.values(value).flatMap(collectErrorMessages);
+}
+
+function getLocationProperties(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object" || !("features" in value) || !Array.isArray(value.features)) return null;
+  const firstFeature: unknown = value.features[0];
+  if (!firstFeature || typeof firstFeature !== "object" || !("properties" in firstFeature)) return null;
+  const properties: unknown = firstFeature.properties;
+  return properties && typeof properties === "object" ? properties as Record<string, unknown> : null;
+}
+
+function getLocationText(properties: Record<string, unknown>, ...keys: string[]) {
+  for (const key of keys) {
+    const value = properties[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
 }
 
 type RazorpayResult = {
@@ -75,6 +92,7 @@ export function CheckoutForm() {
   const clear = useCartStore((state) => state.clear);
   const [coupon, setCoupon] = useState("");
   const [paymentOpen, setPaymentOpen] = useState(false);
+  const [locating, setLocating] = useState(false);
   const totals = useMemo(() => {
     const discount = coupon.toUpperCase() === "FRESH10" ? Math.round(items.reduce((sum, item) => sum + item.price * item.quantity, 0) * 0.1) : 0;
     return calculateTotals(items.map((item) => ({ price: item.price, quantity: item.quantity })), discount);
@@ -95,6 +113,69 @@ export function CheckoutForm() {
       form.setValue("email", session.user.email, { shouldValidate: true });
     }
   }, [form, session?.user.email]);
+
+  async function fillAddressFromLocation() {
+    if (!navigator.geolocation) {
+      toast({ title: "Location unavailable", description: "Your browser does not support location access. Please enter your address manually." });
+      return;
+    }
+
+    setLocating(true);
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: false,
+          timeout: 15_000,
+          maximumAge: 60_000
+        });
+      });
+      const query = new URLSearchParams({
+        lat: String(position.coords.latitude),
+        lon: String(position.coords.longitude)
+      });
+      const response = await fetch(`https://photon.komoot.io/reverse?${query}`, {
+        signal: AbortSignal.timeout(10_000)
+      });
+      if (!response.ok) throw new Error("The address lookup service is unavailable. Please enter your address manually.");
+
+      const properties = getLocationProperties(await response.json());
+      if (!properties) throw new Error("Could not find an address for your location. Please enter it manually.");
+
+      const line1 = [getLocationText(properties, "housenumber"), getLocationText(properties, "street")]
+        .filter(Boolean)
+        .join(" ") || getLocationText(properties, "name");
+      const city = getLocationText(properties, "city", "town", "village", "municipality", "locality");
+      const address = {
+        line1,
+        line2: getLocationText(properties, "district", "suburb", "neighbourhood"),
+        city,
+        state: getLocationText(properties, "state"),
+        postalCode: getLocationText(properties, "postcode"),
+        country: getLocationText(properties, "country")
+      };
+      if (!address.line1 && !address.city && !address.postalCode) {
+        throw new Error("Could not find a usable address for your location. Please enter it manually.");
+      }
+
+      for (const [field, value] of Object.entries(address)) {
+        if (value) {
+          form.setValue(`address.${field}` as `address.${keyof FormValues["address"]}`, value, { shouldValidate: true });
+        }
+      }
+      toast({ title: "Address filled", description: "Check the address details and make any corrections before placing your order." });
+    } catch (error) {
+      const description = error instanceof GeolocationPositionError
+        ? error.code === error.PERMISSION_DENIED
+          ? "Allow location access in your browser, or enter your address manually."
+          : "Could not get your location. Check your device settings and try again."
+        : error instanceof Error
+          ? error.message
+          : "Could not find your address. Please enter it manually.";
+      toast({ title: "Could not set location", description });
+    } finally {
+      setLocating(false);
+    }
+  }
 
   async function onSubmit(values: FormValues) {
     if (!items.length) {
@@ -215,7 +296,14 @@ export function CheckoutForm() {
           </p>
         </section>
         <section className="rounded-lg border bg-card p-5">
-          <h2 className="font-serif text-2xl font-semibold">Shipping address</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-serif text-2xl font-semibold">Shipping address</h2>
+            <Button type="button" variant="outline" onClick={fillAddressFromLocation} disabled={locating}>
+              <MapPin className="h-4 w-4" />
+              {locating ? "Finding location..." : "Use my location"}
+            </Button>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">Allow location access to look up and fill your address. You can review and edit it before ordering.</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <Input placeholder="Full name" {...form.register("address.name")} />
             <Input placeholder="Phone" {...form.register("address.phone")} />
