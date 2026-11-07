@@ -40,18 +40,24 @@ npm run db:push
 
 On Windows, if `createdb` is unavailable, create the database named in `DATABASE_URL` using pgAdmin or PostgreSQL's SQL shell before running the Prisma commands.
 
-5. Seed demo data:
+5. Seed the catalog and demo data:
 
 ```bash
 npm run db:seed
 ```
 
-Seeded demo admin:
+For local development only, create the demo admin explicitly:
+
+```bash
+npm run db:seed -- --demo-admin
+```
+
+Demo admin credentials:
 
 - Email: `admin@zunora.example`
 - Password: `ChangeMe123!`
 
-Run `npm run db:seed` to create or reset this local demo admin account. After signing in, admin accounts open the dashboard automatically at `/admin`. Change the password before using this in production. The `.example` email is a placeholder for local testing.
+Run `npm run db:seed` to create or reset this local demo admin account. After signing in, admin accounts open the dashboard automatically at `/admin`. The demo account uses a known password and must never be created in production. Create a separate admin account and grant it the `ADMIN` role securely for production.
 
 6. Start development:
 
@@ -95,6 +101,7 @@ All replaceable brand values live in [config/site.ts](config/site.ts):
 - Configure fulfillment capacity before advertising the 12-hour dispatch estimate. For prepaid orders the estimate starts after successful payment; for COD orders it starts after order confirmation.
 - Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `RAZORPAY_WEBHOOK_SECRET`. Configure the provider webhook URL as `/api/razorpay` and subscribe to `payment.captured` and `payment.failed`.
 - Run `npm run db:push` after applying the order payment/email tracking schema changes, before deploying the new checkout.
+- For a new production database, run `npm run db:push` and then `npm run db:seed` from a trusted environment with `DATABASE_URL` set to the Render External Database URL. `db:seed` initializes catalog data but does not create the demo admin unless `--demo-admin` is explicitly supplied. Back up existing production data before seeding because seeded catalog entries are updated to match the local catalog.
 - Test online payments in Razorpay test mode and configure automatic capture before accepting live payments.
 - Connect Cloudinary upload endpoints before enabling admin image uploads.
 - Deploy on Vercel or build with the included `Dockerfile`.

@@ -5,18 +5,19 @@ import { categories, products } from "../lib/catalog";
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash("ChangeMe123!", 12);
-
-  await prisma.user.upsert({
-    where: { email: "admin@zunora.example" },
-    update: { passwordHash, role: "ADMIN" },
-    create: {
-      name: "Zunora Admin",
-      email: "admin@zunora.example",
-      passwordHash,
-      role: "ADMIN"
-    }
-  });
+  if (process.argv.includes("--demo-admin")) {
+    const passwordHash = await bcrypt.hash("ChangeMe123!", 12);
+    await prisma.user.upsert({
+      where: { email: "admin@zunora.example" },
+      update: { role: "ADMIN" },
+      create: {
+        name: "Zunora Admin",
+        email: "admin@zunora.example",
+        passwordHash,
+        role: "ADMIN"
+      }
+    });
+  }
 
   for (const category of categories) {
     await prisma.category.upsert({
