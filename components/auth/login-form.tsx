@@ -13,6 +13,17 @@ import { toast } from "@/components/ui/toast";
 
 type FormValues = z.infer<typeof authSchema>;
 
+function getSafeCallbackPath(callbackUrl: string | null) {
+  if (!callbackUrl) return null;
+  try {
+    const destination = new URL(callbackUrl, window.location.origin);
+    if (destination.origin !== window.location.origin) return null;
+    return `${destination.pathname}${destination.search}${destination.hash}`;
+  } catch {
+    return null;
+  }
+}
+
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
@@ -31,7 +42,11 @@ export function LoginForm() {
         return;
       }
       const session = await getSession();
-      router.push(params.get("callbackUrl") ?? (session?.user.role === "ADMIN" ? "/admin" : "/account"));
+      const callbackPath = getSafeCallbackPath(params.get("callbackUrl"));
+      const defaultPath = session?.user.role === "ADMIN" ? "/admin" : "/account";
+      router.push(callbackPath && (session?.user.role === "ADMIN" || !callbackPath.startsWith("/admin"))
+        ? callbackPath
+        : defaultPath);
       router.refresh();
     } catch (error) {
       console.error("Login request failed.", error);

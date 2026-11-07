@@ -9,7 +9,7 @@ async function main() {
     const passwordHash = await bcrypt.hash("ChangeMe123!", 12);
     await prisma.user.upsert({
       where: { email: "admin@zunora.example" },
-      update: { role: "ADMIN" },
+      update: { passwordHash, role: "ADMIN" },
       create: {
         name: "Zunora Admin",
         email: "admin@zunora.example",
@@ -17,6 +17,8 @@ async function main() {
         role: "ADMIN"
       }
     });
+    console.info("Demo admin account created or updated.");
+    return;
   }
 
   for (const category of categories) {

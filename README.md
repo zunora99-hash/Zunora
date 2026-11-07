@@ -30,6 +30,8 @@ Copy-Item .env.example .env
 
 3. Edit `.env` and set `DATABASE_URL` to a PostgreSQL database that exists, set a private random `NEXTAUTH_SECRET`, and set `NEXTAUTH_URL` to the URL and port the app uses (for example, `http://localhost:3001`).
 
+For Vercel, set `NEXTAUTH_URL` to the exact public site origin (for example, `https://your-project.vercel.app`, with no path or port), and set it in the same deployment environment as the site. Do not use a localhost URL in Vercel. Redeploy after changing environment variables.
+
 4. Create the database if needed, then generate Prisma and push the schema:
 
 ```bash
