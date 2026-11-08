@@ -1,13 +1,12 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
-import { categories, products } from "@/lib/catalog";
+import { storefrontProducts } from "@/lib/catalog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   return [
     "", "/shop", "/about", "/contact", "/privacy", "/terms", "/shipping-returns",
-    ...products.map((product) => `/product/${product.slug}`),
-    ...categories.map((category) => `/shop?category=${category.slug}`)
+    ...storefrontProducts.map((product) => `/product/${product.slug}`)
   ].map((path) => ({
     url: `${siteConfig.url}${path}`,
     lastModified: now,

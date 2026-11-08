@@ -1,7 +1,14 @@
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim()
+  || (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
 export const siteConfig = {
   name: "Zunora",
   tagline: "Premium Dry Fruits, Delivered Fresh",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: siteUrl.replace(/\/+$/, ""),
   gstNo: "27ABCDE1234F1Z5",
   fssaiNo: "10019022009876",
   currency: "INR",
@@ -16,10 +23,10 @@ export const siteConfig = {
     mark: "Z"
   },
   contact: {
-    phone: "+91 98765 43210",
-    email: "hello@zunora.example",
-    whatsapp: "919876543210",
-    address: "2nd Floor, Wellness Market, Mumbai, Maharashtra 400001"
+    phone: "+91 9180580677",
+    email: "zuora99@gmail.example",
+    whatsapp: "9180580677",
+    address: "Belagavi, Karataka 591109"
   },
   social: {
     instagram: "https://instagram.com/nutrinest",
@@ -27,7 +34,7 @@ export const siteConfig = {
     x: "https://x.com/nutrinest"
   },
   shipping: {
-    freeAbove: 999,
+    freeAbove: 100,
     flatFee: 79,
     gstRate: 0.05
   }

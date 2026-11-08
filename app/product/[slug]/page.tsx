@@ -1,14 +1,15 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductActions } from "@/components/product/product-actions";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { Badge } from "@/components/ui/badge";
-import { getProductBySlug, getRelatedProducts, products } from "@/lib/catalog";
+import { getProductBySlug, getRelatedProducts, storefrontProducts } from "@/lib/catalog";
 import { createMetadata } from "@/lib/seo";
 import { formatPrice, absoluteUrl } from "@/lib/utils";
 
 export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
+  return storefrontProducts.map((product) => ({ slug: product.slug }));
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
@@ -18,7 +19,8 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
     title: product.name,
     description: product.description,
     path: `/product/${product.slug}`,
-    image: product.images[0]
+    image: product.images[0],
+    keywords: [product.name, "buy cashews online", "Zunora dry fruits", "25 g cashew pack"]
   });
 }
 
@@ -31,48 +33,61 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    image: product.images,
+    image: product.images.map(absoluteUrl),
     description: product.description,
     sku: product.variants[0].id,
     brand: { "@type": "Brand", name: "Zunora" },
-    aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviewCount },
-    offers: {
-      "@type": "AggregateOffer",
-      lowPrice: product.variants[0].price,
-      highPrice: product.variants[product.variants.length - 1].price,
+    ...(product.reviewCount > 0 ? {
+      aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviewCount }
+    } : {}),
+    offers: product.variants.map((variant) => ({
+      "@type": "Offer",
+      price: variant.price,
       priceCurrency: "INR",
-      availability: "https://schema.org/InStock",
-      url: absoluteUrl(`/product/${product.slug}`)
-    }
+      availability: product.variants.some((variant) => variant.stock > 0) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
+      url: absoluteUrl(`/product/${product.slug}`),
+      sku: variant.id
+    }))
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "Cashew packs", item: absoluteUrl("/shop?category=cashews") },
+      { "@type": "ListItem", position: 3, name: product.name, item: absoluteUrl(`/product/${product.slug}`) }
+    ]
   };
 
   return (
     <div className="container py-10">
-      <nav className="text-sm text-muted-foreground">
-        Home / Shop / {product.category} / <span className="text-foreground">{product.name}</span>
+      <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
+        <Link href="/" className="hover:underline">Home</Link> / <Link href="/shop?category=cashews" className="hover:underline">Cashew packs</Link> / <span className="text-foreground">{product.name}</span>
       </nav>
       <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_0.9fr]">
-        <ProductGallery images={product.images} name={product.name} />
+        <ProductGallery images={product.images} video={product.video} name={product.name} />
         <div>
           <Badge>{product.category}</Badge>
           <h1 className="mt-4 font-serif text-5xl font-bold leading-tight">{product.name}</h1>
           <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
+          {product.reviewCount > 0 ? (
+            <div className="mt-5 flex flex-wrap items-center gap-4 text-sm font-semibold">
+              <span>{product.rating} / 5 rating</span>
+              <span>{product.reviewCount} reviews</span>
+            </div>
+          ) : null}
           <div className="mt-5 flex flex-wrap items-center gap-4 text-sm font-semibold">
-            <span>{product.rating} / 5 rating</span>
-            <span>{product.reviewCount} reviews</span>
-            <span>Starts at {formatPrice(product.variants[0].price)}</span>
+            <span>{formatPrice(product.variants[0].price)} / {product.variants[0].label}</span>
           </div>
           <div className="mt-7">
             <ProductActions product={product} />
           </div>
-          <div className="mt-7 grid gap-3 sm:grid-cols-2">
-            {Object.entries(product.nutrition).map(([key, value]) => (
-              <div key={key} className="rounded-lg border bg-card p-4">
-                <p className="text-xs font-bold uppercase text-muted-foreground">{key}</p>
-                <p className="mt-1 font-serif text-2xl font-bold">{value}</p>
-              </div>
-            ))}
-          </div>
+          {product.eligibleForFreeGift ? (
+            <p className="mt-5 rounded-lg border border-olive/30 bg-olive/5 p-4 text-sm font-medium text-olive">
+              Get one free 15 g Pista & Cashew Mix with each 25 g pack during this limited-time offer. The gift is added automatically at checkout.
+            </p>
+          ) : null}
           <div className="mt-7 rounded-lg border bg-card p-5">
             <h2 className="font-serif text-2xl font-semibold">Details</h2>
             <p className="mt-3 text-sm text-muted-foreground">Ingredients: {product.ingredients}</p>
@@ -80,22 +95,6 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
           </div>
         </div>
       </div>
-      <section className="section">
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="eyebrow">Reviews</p>
-            <h2 className="mt-2 font-serif text-3xl font-bold">Loved by everyday snackers</h2>
-          </div>
-        </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {["Fresh, crunchy and well packed.", "The 1kg pack was great value and tasted premium."].map((review) => (
-            <div key={review} className="rounded-lg border bg-card p-5">
-              <p className="font-semibold">★★★★★</p>
-              <p className="mt-2 text-muted-foreground">{review}</p>
-            </div>
-          ))}
-        </div>
-      </section>
       <section className="pb-12">
         <h2 className="font-serif text-3xl font-bold">Related products</h2>
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -105,6 +104,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
         </div>
       </section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
     </div>
   );
 }

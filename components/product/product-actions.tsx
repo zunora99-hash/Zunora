@@ -16,28 +16,39 @@ export function ProductActions({ product }: { product: CatalogProduct }) {
 
   return (
     <div className="rounded-lg border bg-card p-5">
-      <p className="text-sm font-semibold">Choose weight</p>
-      <div className="mt-3 grid grid-cols-3 gap-2">
-        {product.variants.map((variant) => (
-          <button
-            key={variant.id}
-            type="button"
-            onClick={() => setVariantId(variant.id)}
-            className={cn(
-              "rounded-md border p-3 text-left transition hover:border-primary",
-              selected.id === variant.id && "border-primary bg-muted"
-            )}
-          >
-            <span className="block font-semibold">{variant.label}</span>
-            <span className="text-sm text-muted-foreground">{formatPrice(variant.price)}</span>
-          </button>
-        ))}
-      </div>
+      {product.variants.length > 1 ? (
+        <>
+          <p className="text-sm font-semibold">Choose pack size</p>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {product.variants.map((variant) => (
+              <button
+                key={variant.id}
+                type="button"
+                onClick={() => setVariantId(variant.id)}
+                className={cn(
+                  "rounded-md border p-3 text-left transition hover:border-primary",
+                  selected.id === variant.id && "border-primary bg-muted"
+                )}
+              >
+                <span className="block font-semibold">{variant.label}</span>
+                <span className="text-sm text-muted-foreground">{formatPrice(variant.price)}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <p className="text-sm font-semibold">{selected.label} pack</p>
+      )}
+      {product.eligibleForFreeGift ? (
+        <p className="mt-3 rounded-md bg-olive/5 p-3 text-sm text-olive">
+          Limited-time offer: one free 15 g Pista & Cashew Mix with each pack, added automatically at checkout.
+        </p>
+      ) : null}
       <div className="mt-5 flex items-center justify-between">
         <div>
           <p className="font-serif text-3xl font-bold">{formatPrice(selected.price)}</p>
           <p className="text-sm text-muted-foreground">
-            <span className="line-through">{formatPrice(selected.mrp)}</span> · {selected.stock > 0 ? `${selected.stock} in stock` : "Out of stock"}
+            {selected.stock > 0 ? "In stock" : "Out of stock"}
           </p>
         </div>
         <div className="flex items-center rounded-md border">

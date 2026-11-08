@@ -3,13 +3,15 @@ import { SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { categories, filterProducts } from "@/lib/catalog";
+import { filterProducts, storefrontCategories } from "@/lib/catalog";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Shop Dry Fruits",
-  description: "Filter and buy premium almonds, cashews, pistachios, dates, figs, walnuts, raisins, and dry fruits gift boxes online.",
-  path: "/shop"
+  title: "Shop Zunora 25 g Cashew Packs",
+  description: "Buy Zunora Salted, Peri Peri Masala, and Raw & Natural Cashew packs online for ₹40 each. Each pack includes a free 15 g Pista & Cashew Mix during this limited-time offer.",
+  path: "/shop",
+  image: "/products/zunora-salted-cashew-25g.png",
+  keywords: ["buy cashews online", "Zunora cashew packs", "25 g cashew", "salted cashews", "peri peri masala cashews"]
 });
 
 type ShopParams = {
@@ -34,8 +36,8 @@ export default function ShopPage({ searchParams }: { searchParams: ShopParams })
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="eyebrow">Shop</p>
-          <h1 className="mt-2 font-serif text-5xl font-bold">Buy dry fruits online</h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">Premium almonds, cashews, pistachios, walnuts, dates, figs, and dry fruits gift boxes with smart filters.</p>
+          <h1 className="mt-2 font-serif text-5xl font-bold">Shop Zunora cashew packs</h1>
+          <p className="mt-3 max-w-2xl text-muted-foreground">Three 25 g cashew flavours for ₹40 each. One free 15 g Pista & Cashew Mix comes with each eligible pack during this limited-time offer.</p>
         </div>
         <p className="text-sm font-semibold text-muted-foreground">{selected.length} products</p>
       </div>
@@ -43,7 +45,7 @@ export default function ShopPage({ searchParams }: { searchParams: ShopParams })
         <Input name="q" defaultValue={searchParams.q} placeholder="Search products" aria-label="Search products" />
         <select name="category" defaultValue={searchParams.category ?? ""} className="h-11 rounded-md border bg-background px-3 text-sm">
           <option value="">All categories</option>
-          {categories.map((category) => (
+          {storefrontCategories.map((category) => (
             <option key={category.slug} value={category.slug}>{category.name}</option>
           ))}
         </select>
@@ -61,10 +63,16 @@ export default function ShopPage({ searchParams }: { searchParams: ShopParams })
         </Button>
       </form>
       <div className="mt-6 flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <Button key={category.slug} variant={searchParams.category === category.slug ? "default" : "outline"} size="sm" asChild>
-            <Link href={`/shop?category=${category.slug}`}>{category.name}</Link>
-          </Button>
+        {storefrontCategories.map((category) => (
+          category.comingSoon ? (
+            <Button key={category.slug} variant="outline" size="sm" asChild>
+              <Link href={`/shop?category=${category.slug}`}>{category.name} · Coming soon</Link>
+            </Button>
+          ) : (
+            <Button key={category.slug} variant={searchParams.category === category.slug ? "default" : "outline"} size="sm" asChild>
+              <Link href={`/shop?category=${category.slug}`}>{category.name}</Link>
+            </Button>
+          )
         ))}
       </div>
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -75,8 +83,16 @@ export default function ShopPage({ searchParams }: { searchParams: ShopParams })
       {!selected.length ? (
         <div className="grid min-h-80 place-items-center text-center">
           <div>
-            <h2 className="font-serif text-3xl font-bold">No products found</h2>
-            <p className="mt-2 text-muted-foreground">Try another search or reset filters.</p>
+            <h2 className="font-serif text-3xl font-bold">
+              {storefrontCategories.find((category) => category.slug === searchParams.category)?.comingSoon
+                ? "Almonds are coming soon"
+                : "No products found"}
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              {storefrontCategories.find((category) => category.slug === searchParams.category)?.comingSoon
+                ? "We’re preparing the Zunora almond range. Shop our cashew packs in the meantime."
+                : "Try another search or reset filters."}
+            </p>
             <Button className="mt-5" asChild>
               <Link href="/shop">Reset shop</Link>
             </Button>

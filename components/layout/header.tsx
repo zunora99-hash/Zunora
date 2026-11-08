@@ -23,6 +23,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { data: session } = useSession();
+  const accountLabel = session?.user?.name?.trim() || session?.user?.email?.split("@")[0] || "Account";
   const items = useCartStore((state) => state.items);
   const setDrawerOpen = useCartStore((state) => state.setDrawerOpen);
   const { count } = useMemo(() => getCartTotals(items), [items]);
@@ -74,10 +75,15 @@ export function Header() {
             ) : null}
           </Button>
           {session?.user ? (
-            <Button variant="ghost" size="sm" onClick={() => signOut()} className="hidden sm:inline-flex">
-              <UserRound className="h-4 w-4" />
-              Sign out
-            </Button>
+            <div className="hidden items-center gap-2 sm:flex">
+              <Link href="/account" className="flex max-w-40 items-center gap-2 text-sm font-semibold text-cacao hover:text-olive" title={accountLabel}>
+                <UserRound className="h-4 w-4 shrink-0" />
+                <span className="truncate">{accountLabel}</span>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                Sign out
+              </Button>
+            </div>
           ) : (
             <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
               <Link href="/login">

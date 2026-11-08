@@ -7,26 +7,31 @@ type SeoInput = {
   description: string;
   path?: string;
   image?: string;
+  keywords?: string[];
 };
 
-export function createMetadata({ title, description, path = "/", image = "/og.svg" }: SeoInput): Metadata {
+export function createMetadata({ title, description, path = "/", image = "/og.svg", keywords }: SeoInput): Metadata {
   const canonical = absoluteUrl(path);
+  const brandedTitle = title.toLowerCase().startsWith(`${siteConfig.name.toLowerCase()} `)
+    ? title
+    : `${title} | ${siteConfig.name}`;
   return {
-    title: `${title} | ${siteConfig.name}`,
+    title: brandedTitle,
     description,
+    keywords,
     alternates: { canonical },
     openGraph: {
-      title,
+      title: brandedTitle,
       description,
       url: canonical,
       siteName: siteConfig.name,
-      images: [{ url: absoluteUrl(image), width: 1200, height: 630, alt: title }],
+      images: [{ url: absoluteUrl(image), alt: title }],
       locale: "en_IN",
       type: "website"
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: brandedTitle,
       description,
       images: [absoluteUrl(image)]
     }
@@ -40,13 +45,6 @@ export function organizationJsonLd() {
     name: siteConfig.name,
     url: siteConfig.url,
     logo: `${siteConfig.url}/logo.svg`,
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: siteConfig.contact.phone,
-      contactType: "customer support",
-      areaServed: "IN"
-    },
-    sameAs: Object.values(siteConfig.social)
   };
 }
 

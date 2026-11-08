@@ -4,6 +4,8 @@ import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const whatsappMessage = "Hi Zunora! I'd like to buy your dry fruits. Please share the available products and prices.\n";
+
 export function Footer() {
   return (
     <footer className="border-t bg-cacao text-white">
@@ -51,7 +53,7 @@ export function Footer() {
         GST {siteConfig.gstNo} · FSSAI {siteConfig.fssaiNo} · © {new Date().getFullYear()} {siteConfig.name}
       </div>
       <Link
-        href={`https://wa.me/${siteConfig.contact.whatsapp}`}
+        href={`https://wa.me/${siteConfig.contact.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`}
         className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-olive text-white shadow-soft md:bottom-6"
         aria-label="Order on WhatsApp"
       >

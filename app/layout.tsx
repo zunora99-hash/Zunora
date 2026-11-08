@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default: `${siteConfig.name} | ${siteConfig.tagline}`,
-    template: `%s | ${siteConfig.name}`
+    template: "%s"
   },
-  description: "Discover Zunora premium dry fruits and snacks, including Masala Cashews, almonds, pistachios, dates, and curated gift boxes.",
+  description: "Shop Zunora 25 g cashew snack packs online in India. Choose Salted, Peri Peri Masala, or Raw & Natural Cashew, with a free 15 g mix while gift stocks last.",
   applicationName: siteConfig.name
 };
 

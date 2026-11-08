@@ -8,11 +8,13 @@ import { Minus, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCartTotals, useCartStore } from "@/stores/cart";
 import { formatPrice } from "@/lib/utils";
+import { freeGiftProduct, getFreeGiftQuantity } from "@/lib/catalog";
 
 export function CartDrawer() {
   const pathname = usePathname();
   const { items, drawerOpen, setDrawerOpen, updateQuantity, removeItem } = useCartStore();
   const totals = getCartTotals(items);
+  const freeGiftQuantity = getFreeGiftQuantity(items);
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -37,6 +39,11 @@ export function CartDrawer() {
           <div className="flex-1 overflow-y-auto p-5">
             {items.length ? (
               <div className="grid gap-4">
+                {freeGiftProduct && freeGiftQuantity > 0 ? (
+                  <p className="rounded-md border border-olive/30 bg-olive/5 p-3 text-sm text-olive">
+                    {freeGiftQuantity} free 15 g Pista & Cashew Mix added at checkout.
+                  </p>
+                ) : null}
                 {items.map((item) => (
                   <div key={item.variantId} className="grid grid-cols-[72px_1fr] gap-4 rounded-lg border p-3">
                     <Image src={item.image} alt={item.name} width={72} height={72} className="h-18 w-18 rounded-md object-cover" />
@@ -72,7 +79,7 @@ export function CartDrawer() {
               <div className="grid h-full place-items-center text-center">
                 <div>
                   <p className="font-serif text-2xl font-semibold">Your basket is empty</p>
-                  <p className="mt-2 text-sm text-muted-foreground">Add premium almonds, cashews, pistachios, or a gift box.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Add a Zunora 25 g cashew pack to your basket.</p>
                   <Button className="mt-5" asChild onClick={() => setDrawerOpen(false)}>
                     <Link href="/shop">Start shopping</Link>
                   </Button>

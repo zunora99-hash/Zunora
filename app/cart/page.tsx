@@ -6,10 +6,12 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCartTotals, useCartStore } from "@/stores/cart";
 import { formatPrice } from "@/lib/utils";
+import { freeGiftProduct, getFreeGiftQuantity } from "@/lib/catalog";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem } = useCartStore();
   const totals = getCartTotals(items);
+  const freeGiftQuantity = getFreeGiftQuantity(items);
 
   return (
     <div className="container py-10">
@@ -17,6 +19,12 @@ export default function CartPage() {
       {items.length ? (
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]">
           <div className="grid gap-4">
+            {freeGiftProduct && freeGiftQuantity > 0 ? (
+              <div className="flex items-center gap-4 rounded-lg border border-olive/30 bg-olive/5 p-4">
+                <Image src={freeGiftProduct.images[0]} alt={freeGiftProduct.name} width={64} height={64} className="h-16 w-16 rounded-md object-cover" />
+                <p className="text-sm"><strong>{freeGiftQuantity} free 15 g Pista & Cashew Mix</strong> will be added to your order at checkout.</p>
+              </div>
+            ) : null}
             {items.map((item) => (
               <div key={item.variantId} className="grid gap-4 rounded-lg border bg-card p-4 sm:grid-cols-[96px_1fr_auto]">
                 <Image src={item.image} alt={item.name} width={96} height={96} className="h-24 w-24 rounded-md object-cover" />
@@ -50,7 +58,7 @@ export default function CartPage() {
         <div className="grid min-h-96 place-items-center text-center">
           <div>
             <h2 className="font-serif text-3xl font-bold">Your cart is empty</h2>
-            <p className="mt-2 text-muted-foreground">Start with premium almonds or a dry fruits gift box.</p>
+            <p className="mt-2 text-muted-foreground">Browse Zunora 25 g cashew packs.</p>
             <Button className="mt-5" asChild><Link href="/shop">Shop now</Link></Button>
           </div>
         </div>

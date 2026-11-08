@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag, Star } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 import type { CatalogProduct } from "@/lib/catalog";
 import { formatPrice } from "@/lib/utils";
@@ -24,18 +24,15 @@ export function ProductCard({ product, index = 0 }: { product: CatalogProduct; i
       className="group overflow-hidden rounded-lg border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-soft"
     >
       <Link href={`/product/${product.slug}`} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <Image src={product.images[0]} alt={`${product.name} pack`} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover transition duration-500 group-hover:scale-105" />
-          {product.featured ? <Badge className="absolute left-3 top-3">Best seller</Badge> : null}
+        <div className="relative aspect-[2/3] overflow-hidden bg-[#f8efe0]">
+          <Image src={product.images[0]} alt={`${product.name} pack`} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-contain transition duration-500 group-hover:scale-[1.02]" />
+          {product.featured ? <Badge className="absolute left-3 top-3">Available now</Badge> : null}
         </div>
       </Link>
       <div className="p-4">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-semibold uppercase text-olive">{product.category}</p>
-          <span className="flex items-center gap-1 text-xs font-semibold">
-            <Star className="h-3.5 w-3.5 fill-saffron text-saffron" />
-            {product.rating}
-          </span>
+          {product.reviewCount > 0 ? <span className="text-xs font-semibold">{product.rating} / 5 · {product.reviewCount} reviews</span> : null}
         </div>
         <Link href={`/product/${product.slug}`} className="mt-2 block min-h-12 font-serif text-xl font-semibold leading-tight hover:underline">
           {product.name}
@@ -44,7 +41,7 @@ export function ProductCard({ product, index = 0 }: { product: CatalogProduct; i
         <div className="mt-4 flex items-end justify-between gap-3">
           <div>
             <p className="font-serif text-2xl font-bold">{formatPrice(variant.price)}</p>
-            <p className="text-xs text-muted-foreground">starts at {variant.label}</p>
+            <p className="text-xs text-muted-foreground">{variant.label} pack</p>
           </div>
           <Button
             size="icon"

@@ -22,10 +22,16 @@ async function main() {
   }
 
   for (const category of categories) {
+    const categoryData = {
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      image: category.image
+    };
     await prisma.category.upsert({
       where: { slug: category.slug },
-      update: category,
-      create: category
+      update: categoryData,
+      create: categoryData
     });
   }
 
@@ -46,23 +52,7 @@ async function main() {
         featured: product.featured,
         categoryId: category.id,
         metaTitle: `${product.name} Online`,
-        metaDescription: product.shortDescription,
-        variants: {
-          deleteMany: {},
-          create: product.variants.map((variant) => ({
-            id: variant.id,
-            label: variant.label,
-            weightG: variant.weightG,
-            price: variant.price,
-            mrp: variant.mrp,
-            stock: variant.stock,
-            sku: variant.id.toUpperCase()
-          }))
-        },
-        reviews: {
-          deleteMany: {},
-          create: seededReviews()
-        }
+        metaDescription: product.shortDescription
       },
       create: {
         name: product.name,
@@ -79,23 +69,31 @@ async function main() {
         featured: product.featured,
         categoryId: category.id,
         metaTitle: `${product.name} Online`,
-        metaDescription: product.shortDescription,
-        variants: {
-          create: product.variants.map((variant) => ({
-            id: variant.id,
-            label: variant.label,
-            weightG: variant.weightG,
-            price: variant.price,
-            mrp: variant.mrp,
-            stock: variant.stock,
-            sku: variant.id.toUpperCase()
-          }))
-        },
-        reviews: {
-          create: seededReviews()
-        }
+        metaDescription: product.shortDescription
       }
     });
+
+    for (const variant of product.variants) {
+      await prisma.variant.upsert({
+        where: { id: variant.id },
+        update: {
+          label: variant.label,
+          weightG: variant.weightG,
+          price: variant.price,
+          mrp: variant.mrp
+        },
+        create: {
+          id: variant.id,
+          productId: product.id,
+          label: variant.label,
+          weightG: variant.weightG,
+          price: variant.price,
+          mrp: variant.mrp,
+          stock: variant.stock,
+          sku: variant.id.toUpperCase()
+        }
+      });
+    }
   }
 
   await prisma.coupon.upsert({
@@ -121,25 +119,6 @@ async function main() {
     ],
     skipDuplicates: true
   });
-}
-
-function seededReviews() {
-  return [
-    {
-      name: "Aarav Mehta",
-      rating: 5,
-      title: "Fresh and crunchy",
-      comment: "The seal was perfect and the quality felt premium.",
-      approved: true
-    },
-    {
-      name: "Neha Rao",
-      rating: 4,
-      title: "Great for gifting",
-      comment: "Clean packing, quick delivery, and balanced flavor.",
-      approved: true
-    }
-  ];
 }
 
 main()

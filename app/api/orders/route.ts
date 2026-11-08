@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "@/auth";
-import { products, type CatalogProduct, type CatalogVariant } from "@/lib/catalog";
+import { freeGiftProduct, getFreeGiftQuantity, products, type CatalogProduct, type CatalogVariant } from "@/lib/catalog";
 import { calculateTotals } from "@/lib/pricing";
 import { getRazorpayClient } from "@/lib/razorpay";
 import { sendOrderConfirmationForOrder } from "@/lib/order-notifications";
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
   const enrichedItems: Array<{ product: CatalogProduct; variant: CatalogVariant; quantity: number }> = [];
   for (const item of parsed.data.items) {
-    const product = products.find((entry) => entry.id === item.productId);
+    const product = products.find((entry) => entry.id === item.productId && entry.availableForSale);
     const variant = product?.variants.find((entry) => entry.id === item.variantId);
     if (!product || !variant) {
       return NextResponse.json({ error: "A product in your cart is no longer available. Refresh your cart and try again." }, { status: 400 });
@@ -40,6 +40,11 @@ export async function POST(request: Request) {
   const subtotalItems = enrichedItems.map((item) => ({ price: item.variant.price, quantity: item.quantity }));
   const discount = parsed.data.couponCode?.toUpperCase() === "FRESH10" ? Math.round(calculateTotals(subtotalItems).subtotal * 0.1) : 0;
   const totals = calculateTotals(subtotalItems, discount);
+  const giftQuantity = getFreeGiftQuantity(parsed.data.items);
+  if (giftQuantity && !freeGiftProduct) {
+    console.error("Cashew promotion is enabled, but its free-gift product is missing from the catalog.");
+    return NextResponse.json({ error: "The free-gift offer is temporarily unavailable. Please try again later." }, { status: 503 });
+  }
 
   const email = session?.user.email ?? parsed.data.email;
   const orderNumber = `ZN-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
@@ -84,15 +89,26 @@ export async function POST(request: Request) {
           total: totals.total,
           couponCode: parsed.data.couponCode?.toUpperCase(),
           items: {
-            create: enrichedItems.map(({ product, variant, quantity }) => ({
-              productId: product.id,
-              variantId: variant.id,
-              name: product.name,
-              variant: variant.label,
-              price: variant.price,
-              quantity,
-              image: product.images[0]
-            }))
+            create: [
+              ...enrichedItems.map(({ product, variant, quantity }) => ({
+                productId: product.id,
+                variantId: variant.id,
+                name: product.name,
+                variant: variant.label,
+                price: variant.price,
+                quantity,
+                image: product.images[0]
+              })),
+              ...(giftQuantity && freeGiftProduct ? [{
+                productId: freeGiftProduct.id,
+                variantId: freeGiftProduct.variants[0].id,
+                name: freeGiftProduct.name,
+                variant: freeGiftProduct.variants[0].label,
+                price: 0,
+                quantity: giftQuantity,
+                image: freeGiftProduct.images[0]
+              }] : [])
+            ]
           }
         }
       });

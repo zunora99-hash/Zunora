@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { checkoutSchema } from "@/lib/validations";
 import { calculateTotals } from "@/lib/pricing";
+import { freeGiftProduct, getFreeGiftQuantity } from "@/lib/catalog";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart";
 
@@ -97,6 +98,7 @@ export function CheckoutForm() {
     const discount = coupon.toUpperCase() === "FRESH10" ? Math.round(items.reduce((sum, item) => sum + item.price * item.quantity, 0) * 0.1) : 0;
     return calculateTotals(items.map((item) => ({ price: item.price, quantity: item.quantity })), discount);
   }, [coupon, items]);
+  const freeGiftQuantity = getFreeGiftQuantity(items);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(checkoutFormSchema),
@@ -343,6 +345,16 @@ export function CheckoutForm() {
               <p className="text-sm font-semibold">{formatPrice(item.price * item.quantity)}</p>
             </div>
           ))}
+          {freeGiftProduct && freeGiftQuantity > 0 ? (
+            <div className="grid grid-cols-[56px_1fr_auto] items-center gap-3 rounded-md border border-olive/30 bg-olive/5 p-2">
+              <Image src={freeGiftProduct.images[0]} alt={freeGiftProduct.name} width={56} height={56} className="h-14 w-14 rounded-md object-cover" />
+              <div>
+                <p className="text-sm font-semibold">{freeGiftProduct.name}</p>
+                <p className="text-xs text-muted-foreground">Free gift · {freeGiftQuantity} pack{freeGiftQuantity === 1 ? "" : "s"}</p>
+              </div>
+              <p className="text-sm font-semibold text-olive">FREE</p>
+            </div>
+          ) : null}
         </div>
         <div className="mt-5 flex gap-2">
           <Input value={coupon} onChange={(event) => setCoupon(event.target.value)} placeholder="Coupon code" />
