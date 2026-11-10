@@ -24,7 +24,10 @@ export function ProductActions({ product }: { product: CatalogProduct }) {
               <button
                 key={variant.id}
                 type="button"
-                onClick={() => setVariantId(variant.id)}
+                onClick={() => {
+                  setVariantId(variant.id);
+                  setQuantity((value) => Math.min(value, variant.stock || 1));
+                }}
                 className={cn(
                   "rounded-md border p-3 text-left transition hover:border-primary",
                   selected.id === variant.id && "border-primary bg-muted"
@@ -46,7 +49,8 @@ export function ProductActions({ product }: { product: CatalogProduct }) {
       ) : null}
       <div className="mt-5 flex items-center justify-between">
         <div>
-          <p className="font-serif text-3xl font-bold">{formatPrice(selected.price)}</p>
+          <p className="text-sm text-muted-foreground">{formatPrice(selected.price)} each</p>
+          <p aria-live="polite" className="font-serif text-3xl font-bold">{formatPrice(selected.price * quantity)}</p>
           <p className="text-sm text-muted-foreground">
             {selected.stock > 0 ? "In stock" : "Out of stock"}
           </p>
@@ -56,7 +60,7 @@ export function ProductActions({ product }: { product: CatalogProduct }) {
             <Minus className="h-4 w-4" />
           </button>
           <span className="w-10 text-center font-semibold">{quantity}</span>
-          <button className="p-3" aria-label="Increase quantity" onClick={() => setQuantity((value) => value + 1)}>
+          <button className="p-3" aria-label="Increase quantity" disabled={quantity >= selected.stock} onClick={() => setQuantity((value) => Math.min(selected.stock, value + 1))}>
             <Plus className="h-4 w-4" />
           </button>
         </div>

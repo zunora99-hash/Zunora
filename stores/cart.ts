@@ -33,12 +33,26 @@ export const useCartStore = create<CartState>()(
       drawerOpen: false,
       addItem: (product, variant, quantity = 1) =>
         set((state) => {
-          const existing = state.items.find((item) => item.variantId === variant.id);
+          const safeQuantity = Number.isFinite(quantity) ? Math.max(1, Math.floor(quantity)) : 1;
+          const existing = state.items.find(
+            (item) => item.productId === product.id && item.variantId === variant.id
+          );
           if (existing) {
             return {
               drawerOpen: true,
               items: state.items.map((item) =>
-                item.variantId === variant.id ? { ...item, quantity: item.quantity + quantity } : item
+                item.productId === product.id && item.variantId === variant.id
+                  ? {
+                      ...item,
+                      name: product.name,
+                      slug: product.slug,
+                      image: product.images[0],
+                      variant: variant.label,
+                      price: variant.price,
+                      mrp: variant.mrp,
+                      quantity: Math.min(variant.stock, item.quantity + safeQuantity)
+                    }
+                  : item
               )
             };
           }
@@ -55,7 +69,7 @@ export const useCartStore = create<CartState>()(
                 variant: variant.label,
                 price: variant.price,
                 mrp: variant.mrp,
-                quantity
+                quantity: Math.min(variant.stock, safeQuantity)
               }
             ]
           };
@@ -65,7 +79,9 @@ export const useCartStore = create<CartState>()(
       updateQuantity: (variantId, quantity) =>
         set((state) => ({
           items: state.items.map((item) =>
-            item.variantId === variantId ? { ...item, quantity: Math.max(1, quantity) } : item
+            item.variantId === variantId
+              ? { ...item, quantity: Math.max(1, Math.floor(quantity)) }
+              : item
           )
         })),
       clear: () => set({ items: [] }),

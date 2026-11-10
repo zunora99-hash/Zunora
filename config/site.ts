@@ -5,7 +5,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim()
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000");
 
-export const siteConfig = {
+export const  siteConfig = {
   name: "Zunora",
   tagline: "Premium Dry Fruits, Delivered Fresh",
   url: siteUrl.replace(/\/+$/, ""),
@@ -29,7 +29,7 @@ export const siteConfig = {
     address: "Belagavi, Karataka 591109"
   },
   social: {
-    instagram: "https://instagram.com/nutrinest",
+    instagram: "https://instagram.com/zunora_101126?srtk=b3EwcmFmYXc4aXVp",
     facebook: "https://facebook.com/nutrinest",
     x: "https://x.com/nutrinest"
   },
