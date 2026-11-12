@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { getCartTotals, useCartStore } from "@/stores/cart";
 import { formatPrice } from "@/lib/utils";
 import { freeGiftProduct, getFreeGiftQuantity } from "@/lib/catalog";
+import { getDeliveryCharge } from "@/lib/pricing";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem } = useCartStore();
@@ -50,7 +51,11 @@ export default function CartPage() {
               <span className="text-muted-foreground">Subtotal</span>
               <span className="font-serif text-3xl font-bold">{formatPrice(totals.subtotal)}</span>
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">Shipping, GST, and coupons are calculated securely during checkout.</p>
+            <div className="mt-3 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Delivery</span>
+              <span className="font-semibold">{getDeliveryCharge(totals.subtotal) === 0 ? "Free" : formatPrice(getDeliveryCharge(totals.subtotal))}</span>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">Free delivery on orders of ₹100 or more. Orders below ₹100 have a ₹25 delivery charge. GST and coupons are calculated at checkout.</p>
             <Button className="mt-5 w-full" asChild><Link href="/checkout">Checkout</Link></Button>
           </aside>
         </div>

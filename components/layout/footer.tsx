@@ -13,6 +13,11 @@ export function Footer() {
         <div>
           <p className="font-serif text-2xl font-bold">{siteConfig.name}</p>
           <p className="mt-3 max-w-sm text-sm text-white/75">{siteConfig.tagline}. Batch-packed dry fruits, transparent sourcing, and festive-ready freshness.</p>
+          <div className="mt-3 grid gap-1 text-sm text-white/75">
+            <p>{siteConfig.contact.address}</p>
+            <a href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`} className="hover:underline">{siteConfig.contact.phone}</a>
+            <a href={`mailto:${siteConfig.contact.email}`} className="hover:underline">{siteConfig.contact.email}</a>
+          </div>
           <div className="mt-5 flex gap-3">
             <Link href={siteConfig.social.instagram} aria-label="Instagram">
               <Instagram className="h-5 w-5" />
@@ -28,6 +33,7 @@ export function Footer() {
             <Link href="/shop?category=almonds">Premium almonds</Link>
             <Link href="/shop?category=cashews">Cashews</Link>
             <Link href="/shop?category=gift-boxes">Dry fruits gift boxes</Link>
+            <Link href="/dry-fruits-belgaum">Dry fruits in Belagavi & Belgaum</Link>
           </div>
         </div>
         <div>
@@ -49,8 +55,11 @@ export function Footer() {
           </div>
         </form>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">
+      {/* <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">
         GST {siteConfig.gstNo} · FSSAI {siteConfig.fssaiNo} · © {new Date().getFullYear()} {siteConfig.name}
+      </div> */}
+      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">
+        All rights are reserved by · © {new Date().getFullYear()} {siteConfig.name}
       </div>
       <Link
         href={`https://wa.me/${siteConfig.contact.whatsapp}?text=${encodeURIComponent(whatsappMessage)}`}

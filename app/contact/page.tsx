@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/config/site";
 import { createMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Contact", description: "Contact Zunora for dry fruits orders, gifting, support, and wholesale enquiries.", path: "/contact" });
+export const metadata = createMetadata({ title: "Contact Zunora in Belagavi | Dry Fruits Support", description: "Contact Zunora in Belagavi, Karnataka for dry fruits orders, product questions, and customer support.", path: "/contact" });
 
 export default function ContactPage({ searchParams }: { searchParams: { sent?: string } }) {
   return (

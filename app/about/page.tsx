@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Leaf, ShieldCheck, Sprout } from "lucide-react";
 import { createMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "About", description: "Learn about Zunora sourcing, freshness, and premium dry fruits quality.", path: "/about" });
+export const metadata = createMetadata({ title: "About Zunora | Dry Fruits in Belagavi", description: "Learn about Zunora, a Belagavi-based online dry fruits brand offering cashew snack packs to customers in Belgaum and across India.", path: "/about" });
 
 const values = [
   { title: "Sourcing", icon: Sprout, copy: "Supplier checks and product-specific quality specs." },
@@ -17,7 +17,7 @@ export default function AboutPage() {
         <div>
           <p className="eyebrow">About Zunora</p>
           <h1 className="mt-3 font-serif text-5xl font-bold">Dry fruits with traceable quality and everyday warmth.</h1>
-          <p className="mt-5 text-lg text-muted-foreground">Zunora is built for customers who want to enjoy quality dry fruits and snacks. We focus on careful selection, fresh packing, and clear product information.</p>
+          <p className="mt-5 text-lg text-muted-foreground">Based in Belagavi, Karnataka, Zunora offers dry fruit snacks online to customers in Belagavi (Belgaum) and across India. We focus on careful selection, fresh packing, and clear product information.</p>
         </div>
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
           <Image src="https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?auto=format&fit=crop&w=1000&q=85" alt="Dry fruits and seeds arranged for packing" fill className="object-cover" />

@@ -154,6 +154,8 @@ model Address {
   state      String
   postalCode String
   country    String   @default("India")
+  latitude   Float?
+  longitude  Float?
   user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   orders     Order[]
   createdAt  DateTime @default(now())

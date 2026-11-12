@@ -48,6 +48,7 @@ export default async function AdminDashboardPage() {
         paymentStatus: true,
         total: true,
         createdAt: true,
+        address: { select: { latitude: true, longitude: true } },
         _count: { select: { items: true } }
       }
     }),
@@ -130,7 +131,7 @@ export default async function AdminDashboardPage() {
         <CardContent className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="text-muted-foreground">
-              <tr><th className="py-3">Order</th><th>Customer email</th><th>Order</th><th>Payment</th><th>Items</th><th>Total</th><th>Date</th></tr>
+              <tr><th className="py-3">Order</th><th>Customer email</th><th>Order</th><th>Payment</th><th>Items</th><th>Total</th><th>Delivery pin</th><th>Date</th></tr>
             </thead>
             <tbody>
               {recentOrders.map((order) => (
@@ -141,10 +142,22 @@ export default async function AdminDashboardPage() {
                   <td>{order.paymentStatus}</td>
                   <td>{order._count.items}</td>
                   <td>{formatPrice(order.total)}</td>
+                  <td>
+                    {order.address.latitude !== null && order.address.longitude !== null ? (
+                      <a
+                        href={`https://www.openstreetmap.org/?mlat=${order.address.latitude}&mlon=${order.address.longitude}#map=18/${order.address.latitude}/${order.address.longitude}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary underline"
+                      >
+                        Open map
+                      </a>
+                    ) : "—"}
+                  </td>
                   <td>{order.createdAt.toLocaleDateString("en-IN")}</td>
                 </tr>
               ))}
-              {!recentOrders.length ? <tr><td colSpan={7} className="py-8 text-center text-muted-foreground">No orders yet. Orders will appear here after checkout.</td></tr> : null}
+              {!recentOrders.length ? <tr><td colSpan={8} className="py-8 text-center text-muted-foreground">No orders yet. Orders will appear here after checkout.</td></tr> : null}
             </tbody>
           </table>
         </CardContent>

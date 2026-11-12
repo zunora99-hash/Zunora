@@ -2,7 +2,7 @@ import { LoginForm } from "@/components/auth/login-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Login", description: "Login to your Zunora account.", path: "/login" });
+export const metadata = createMetadata({ title: "Login", description: "Login to your Zunora account.", path: "/login", noIndex: true });
 
 export default function LoginPage() {
   const googleConfigured = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);

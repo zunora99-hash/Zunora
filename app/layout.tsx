@@ -21,8 +21,9 @@ export const metadata: Metadata = {
     default: `${siteConfig.name} | ${siteConfig.tagline}`,
     template: "%s"
   },
-  description: "Shop Zunora 25 g cashew snack packs online in India. Choose Salted, Peri Peri Masala, or Raw & Natural Cashew, with a free 15 g mix while gift stocks last.",
-  applicationName: siteConfig.name
+  description: "Shop Zunora 25 g cashew snack packs online in Belagavi (Belgaum) and across India. Choose Salted, Peri Peri Masala, or Raw & Natural Cashew.",
+  applicationName: siteConfig.name,
+  icons: { icon: "/favicon.svg" }
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

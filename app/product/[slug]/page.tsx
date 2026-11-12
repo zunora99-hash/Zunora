@@ -17,7 +17,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   if (!product) return {};
   return createMetadata({
     title: product.name,
-    description: product.description,
+    description: `${product.description} Order online from Zunora in Belagavi (Belgaum) or elsewhere in India.`,
     path: `/product/${product.slug}`,
     image: product.images[0],
     keywords: [product.name, "buy cashews online", "Zunora dry fruits", "25 g cashew pack"]

@@ -6,6 +6,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { authSchema } from "@/lib/validations";
 
+// Vercel's deployment URL can be a unique preview hostname. Use the stable
+// production project domain for OAuth callbacks on production deployments.
+const vercelProductionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+if (process.env.VERCEL_ENV === "production" && vercelProductionHost) {
+  process.env.NEXTAUTH_URL = new URL(`https://${vercelProductionHost}`).origin;
+}
+
 const providers = [
   CredentialsProvider({
     name: "Email and password",

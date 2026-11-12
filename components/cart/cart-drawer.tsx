@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { getCartTotals, useCartStore } from "@/stores/cart";
 import { formatPrice } from "@/lib/utils";
 import { freeGiftProduct, getFreeGiftQuantity } from "@/lib/catalog";
+import { getDeliveryCharge } from "@/lib/pricing";
 
 export function CartDrawer() {
   const pathname = usePathname();
@@ -92,6 +93,13 @@ export function CartDrawer() {
               <span className="text-sm text-muted-foreground">Subtotal</span>
               <span className="font-serif text-2xl font-semibold">{formatPrice(totals.subtotal)}</span>
             </div>
+            {items.length ? (
+              <div className="mb-4 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Delivery</span>
+                <span className="font-semibold">{getDeliveryCharge(totals.subtotal) === 0 ? "Free" : formatPrice(getDeliveryCharge(totals.subtotal))}</span>
+              </div>
+            ) : null}
+            <p className="mb-4 text-xs text-muted-foreground">Free delivery on orders of ₹100 or more; ₹25 delivery below ₹100.</p>
             <Button className="w-full" asChild disabled={!items.length} onClick={() => setDrawerOpen(false)}>
               <Link href="/checkout">Checkout</Link>
             </Button>

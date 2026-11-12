@@ -32,6 +32,16 @@ Copy-Item .env.example .env
 
 For Vercel, set `NEXTAUTH_URL` to the exact public site origin (for example, `https://your-project.vercel.app`, with no path or port), and set it in the same deployment environment as the site. Do not use a localhost URL in Vercel. Redeploy after changing environment variables.
 
+### Google sign-in redirect
+
+Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in the same environment as the app. In Google Cloud Console, add this exact URI under the OAuth client's **Authorized redirect URIs**:
+
+`<NEXTAUTH_URL>/api/auth/callback/google`
+
+The URI must use the same scheme, hostname, and port as `NEXTAUTH_URL`. Add every environment you use to the same Google OAuth client; local and production redirect URIs can both be registered. For the local `.env` example using port 3001, add `http://localhost:3001/api/auth/callback/google`. For production on Vercel, this app uses the stable `VERCEL_PROJECT_PRODUCTION_URL` host so OAuth does not use a deployment-specific preview URL; add `https://zunora.vercel.app/api/auth/callback/google` for the current production domain. The deployed `GOOGLE_CLIENT_ID` must belong to this same OAuth client. Save the Google OAuth client settings, then restart locally or redeploy after changing environment variables.
+
+Checkout's map pin coordinates are stored with the delivery address. After applying the schema change, run `npm run db:push` against the target database before deploying checkout, then regenerate Prisma with `npm run db:generate` as part of the build.
+
 4. Create the database if needed, then generate Prisma and push the schema:
 
 ```bash
@@ -97,7 +107,8 @@ All replaceable brand values live in [config/site.ts](config/site.ts):
 - Use managed PostgreSQL for `DATABASE_URL`.
 - Set `NEXT_PUBLIC_SITE_URL` to your public canonical HTTPS domain (for example, `https://www.example.com`) in Vercel so canonical links, structured data, and the sitemap point to the production site.
 - After deploying the launch catalog changes, run `npm run db:seed` with `DATABASE_URL` set to the Render database. This upserts the new 25 g cashew SKUs and the 15 g zero-price gift SKU; it preserves existing order items, reviews, and on-hand variant stock. New SKUs start with the stock configured in `lib/catalog.ts` and should be checked against physical inventory before accepting orders.
-- Submit `https://your-domain.com/sitemap.xml` in Google Search Console after the public domain is live. SEO metadata and structured product data help discovery, but search ranking and placement cannot be guaranteed.
+- Verify the production domain as a Domain property in Google Search Console, submit `https://zunora.vercel.app/sitemap.xml`, and inspect/request indexing for the home page, `/dry-fruits-belgaum`, the shop page, and each product URL. The code publishes a sitemap and `robots.txt` already references it. A sitemap is a crawl hint, not an indexing or ranking guarantee.
+- Keep the public business name, phone, email, address, and site URL consistent across the Contact page, Organization structured data, and any public business listings. Create a Google Business Profile only if Zunora meets Google's in-person customer-contact eligibility; online-only businesses aren't eligible.
 - Set a strong `NEXTAUTH_SECRET`.
 - To enable consent-based Google Analytics 4, set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 measurement ID (for example, `G-XXXXXXXXXX`). Analytics will not load until a visitor accepts analytics cookies; visitors can reject or change their choice through Cookie settings. If the variable is blank, analytics and the cookie prompt remain disabled.
 - For free-tier email delivery, create an EmailJS account, connect and verify an email service, then create an order-confirmation template. Set the template's **To Email** to `{{to_email}}`, its subject to `{{email_subject}}`, and its HTML body to `{{{invoice_html}}}`. For the plain-text body, use `{{invoice_text}}` if the template editor supports one. Add the service ID, template ID, and public key to `.env` as `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, and `EMAILJS_PUBLIC_KEY`. `EMAILJS_PRIVATE_KEY` is optional and can be set for server-side API authentication. These values are only read by the server; do not prefix them with `NEXT_PUBLIC_`. EmailJS is tried first when configured; if it fails, configured SMTP is tried automatically.

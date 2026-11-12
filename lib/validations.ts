@@ -25,7 +25,9 @@ export const addressSchema = z.object({
   city: z.string().min(2),
   state: z.string().min(2),
   postalCode: z.string().min(4),
-  country: z.string().default("India")
+  country: z.string().default("India"),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional()
 });
 
 export const checkoutSchema = z.object({

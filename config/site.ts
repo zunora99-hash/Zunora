@@ -24,9 +24,9 @@ export const  siteConfig = {
   },
   contact: {
     phone: "+91 9180580677",
-    email: "zuora99@gmail.example",
+    email: "zunora99@gmail.com",
     whatsapp: "9180580677",
-    address: "Belagavi, Karataka 591109"
+    address: "Belagavi, Karnataka 591109"
   },
   social: {
     instagram: "https://instagram.com/zunora_101126?srtk=b3EwcmFmYXc4aXVp",
@@ -35,7 +35,7 @@ export const  siteConfig = {
   },
   shipping: {
     freeAbove: 100,
-    flatFee: 79,
+    flatFee: 25,
     gstRate: 0.05
   }
 } as const;

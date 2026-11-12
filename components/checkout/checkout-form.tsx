@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { LocationPickerMap, type Coordinates } from "@/components/checkout/location-picker-map";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
@@ -94,6 +95,7 @@ export function CheckoutForm() {
   const [coupon, setCoupon] = useState("");
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [pinPosition, setPinPosition] = useState<Coordinates | null>(null);
   const totals = useMemo(() => {
     const discount = coupon.toUpperCase() === "FRESH10" ? Math.round(items.reduce((sum, item) => sum + item.price * item.quantity, 0) * 0.1) : 0;
     return calculateTotals(items.map((item) => ({ price: item.price, quantity: item.quantity })), discount);
@@ -116,6 +118,38 @@ export function CheckoutForm() {
     }
   }, [form, session?.user.email]);
 
+  async function applyCoordinates(coordinates: Coordinates) {
+    setPinPosition(coordinates);
+    form.setValue("address.latitude", coordinates.latitude, { shouldValidate: true });
+    form.setValue("address.longitude", coordinates.longitude, { shouldValidate: true });
+
+    try {
+      const query = new URLSearchParams({ lat: String(coordinates.latitude), lon: String(coordinates.longitude) });
+      const response = await fetch(`https://photon.komoot.io/reverse?${query}`, { signal: AbortSignal.timeout(10_000) });
+      if (!response.ok) throw new Error("Address lookup is unavailable. Your pin is saved; enter the address fields manually.");
+      const properties = getLocationProperties(await response.json());
+      if (!properties) throw new Error("No address was found for this pin. Your pin is saved; enter the address fields manually.");
+
+      const address = {
+        line1: [getLocationText(properties, "housenumber"), getLocationText(properties, "street")].filter(Boolean).join(" ") || getLocationText(properties, "name"),
+        line2: getLocationText(properties, "district", "suburb", "neighbourhood"),
+        city: getLocationText(properties, "city", "town", "village", "municipality", "locality"),
+        state: getLocationText(properties, "state"),
+        postalCode: getLocationText(properties, "postcode"),
+        country: getLocationText(properties, "country")
+      };
+      for (const [field, value] of Object.entries(address)) {
+        if (value) form.setValue(`address.${field}` as `address.${keyof FormValues["address"]}`, value, { shouldValidate: true });
+      }
+      toast({ title: "Map pin selected", description: "Review the filled address and adjust the pin if needed." });
+    } catch (error) {
+      toast({
+        title: "Pin saved; address needs review",
+        description: error instanceof Error ? error.message : "Enter your address manually to continue."
+      });
+    }
+  }
+
   async function fillAddressFromLocation() {
     if (!navigator.geolocation) {
       toast({ title: "Location unavailable", description: "Your browser does not support location access. Please enter your address manually." });
@@ -131,40 +165,7 @@ export function CheckoutForm() {
           maximumAge: 60_000
         });
       });
-      const query = new URLSearchParams({
-        lat: String(position.coords.latitude),
-        lon: String(position.coords.longitude)
-      });
-      const response = await fetch(`https://photon.komoot.io/reverse?${query}`, {
-        signal: AbortSignal.timeout(10_000)
-      });
-      if (!response.ok) throw new Error("The address lookup service is unavailable. Please enter your address manually.");
-
-      const properties = getLocationProperties(await response.json());
-      if (!properties) throw new Error("Could not find an address for your location. Please enter it manually.");
-
-      const line1 = [getLocationText(properties, "housenumber"), getLocationText(properties, "street")]
-        .filter(Boolean)
-        .join(" ") || getLocationText(properties, "name");
-      const city = getLocationText(properties, "city", "town", "village", "municipality", "locality");
-      const address = {
-        line1,
-        line2: getLocationText(properties, "district", "suburb", "neighbourhood"),
-        city,
-        state: getLocationText(properties, "state"),
-        postalCode: getLocationText(properties, "postcode"),
-        country: getLocationText(properties, "country")
-      };
-      if (!address.line1 && !address.city && !address.postalCode) {
-        throw new Error("Could not find a usable address for your location. Please enter it manually.");
-      }
-
-      for (const [field, value] of Object.entries(address)) {
-        if (value) {
-          form.setValue(`address.${field}` as `address.${keyof FormValues["address"]}`, value, { shouldValidate: true });
-        }
-      }
-      toast({ title: "Address filled", description: "Check the address details and make any corrections before placing your order." });
+      await applyCoordinates({ latitude: position.coords.latitude, longitude: position.coords.longitude });
     } catch (error) {
       const description = error instanceof GeolocationPositionError
         ? error.code === error.PERMISSION_DENIED
@@ -305,7 +306,10 @@ export function CheckoutForm() {
               {locating ? "Finding location..." : "Use my location"}
             </Button>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">Allow location access to look up and fill your address. You can review and edit it before ordering.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Allow location access to find your address, or search and pin it on the map. Review the address before ordering. Map tiles and address lookup use OpenStreetMap and Photon; the selected pin is saved with your delivery address.</p>
+          <div className="mt-4">
+            <LocationPickerMap position={pinPosition} onSelect={applyCoordinates} />
+          </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <Input placeholder="Full name" {...form.register("address.name")} />
             <Input placeholder="Phone" {...form.register("address.phone")} />
@@ -360,6 +364,7 @@ export function CheckoutForm() {
           <Input value={coupon} onChange={(event) => setCoupon(event.target.value)} placeholder="Coupon code" />
           <Button type="button" variant="outline" onClick={() => setCoupon(coupon.trim().toUpperCase())}>Apply</Button>
         </div>
+        <p className="mt-3 text-xs text-muted-foreground">Orders of ₹100 or more get free delivery. Orders below ₹100 have a ₹25 delivery charge.</p>
         <div className="mt-5 grid gap-2 border-t pt-5 text-sm">
           <SummaryLine label="Subtotal" value={totals.subtotal} />
           <SummaryLine label="Discount" value={-totals.discount} />

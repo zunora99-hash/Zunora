@@ -1,7 +1,7 @@
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { createMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Checkout", description: "Secure checkout for Zunora dry fruits orders.", path: "/checkout" });
+export const metadata = createMetadata({ title: "Checkout", description: "Secure checkout for Zunora dry fruits orders.", path: "/checkout", noIndex: true });
 
 export default function CheckoutPage() {
   return (

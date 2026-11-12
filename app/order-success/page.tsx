@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { createMetadata } from "@/lib/seo";
+
+export const metadata = createMetadata({ title: "Order received", description: "Your Zunora order confirmation.", path: "/order-success", noIndex: true });
 
 export default function OrderSuccessPage({ searchParams }: { searchParams: { order?: string; email?: string } }) {
   return (

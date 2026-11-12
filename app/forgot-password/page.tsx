@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { createMetadata } from "@/lib/seo";
+
+export const metadata = createMetadata({ title: "Reset password", description: "Reset your Zunora account password.", path: "/forgot-password", noIndex: true });
 
 export default function ForgotPasswordPage() {
   return (

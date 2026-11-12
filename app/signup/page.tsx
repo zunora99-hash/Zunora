@@ -2,7 +2,7 @@ import { SignupForm } from "@/components/auth/signup-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "Signup", description: "Create your Zunora account.", path: "/signup" });
+export const metadata = createMetadata({ title: "Signup", description: "Create your Zunora account.", path: "/signup", noIndex: true });
 
 export default function SignupPage() {
   return (

@@ -7,6 +7,7 @@ export default function ShippingReturnsPage() {
     <div className="container max-w-3xl py-12">
       <h1 className="font-serif text-5xl font-bold">Shipping and Return Policy</h1>
       <div className="mt-6 grid gap-4 text-muted-foreground">
+        <p>Delivery is free on orders of ₹100 or more. Orders below ₹100 have a ₹25 delivery charge, shown at checkout.</p>
         <p>Orders usually ship within 1-2 business days. Delivery timelines depend on destination pincode and courier serviceability.</p>
         <p>Food products are returnable only if damaged, incorrect, expired, or tampered on arrival. Please contact support within 48 hours with photos.</p>
         <p>Refunds are processed to the original payment method after inspection and approval.</p>

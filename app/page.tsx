@@ -8,11 +8,11 @@ import { freeGiftProduct, storefrontCategories, storefrontProducts } from "@/lib
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Buy Dry Fruits Online in India | Cashew Packs",
-  description: "Shop Zunora 25 g salted, peri peri masala, and raw cashew snack packs for ₹40 each. Get a free 15 g Pista & Cashew Mix with each cashew pack during this limited-time offer. Almonds coming soon.",
+  title: "Dry Fruits in Belagavi (Belgaum) | Zunora",
+  description: "Looking for dry fruits in Belagavi or Belgaum? Shop Zunora 25 g cashew packs online, with Salted, Peri Peri Masala, and Raw & Natural flavours.",
   path: "/",
   image: "/products/zunora-salted-cashew-25g.png",
-  keywords: ["buy dry fruits online India", "Zunora dry fruits", "cashew snacks", "25 g cashew pack", "peri peri cashew", "salted cashews"]
+  keywords: ["dry fruits Belagavi", "dry fruits Belgaum", "Zunora dry fruits", "buy cashews online", "cashew snacks"]
 });
 
 export default function HomePage() {
@@ -21,6 +21,18 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <section className="section bg-white/45">
+        <div className="container mx-auto max-w-4xl text-center">
+          <p className="eyebrow">Belagavi · Belgaum</p>
+          <h2 className="mt-2 font-serif text-4xl font-bold">Dry fruits in Belagavi, also known as Belgaum</h2>
+          <p className="mx-auto mt-4 max-w-3xl text-muted-foreground">
+            Zunora is based in Belagavi, Karnataka, and sells dry fruit snacks online. Our current range features 25 g cashew packs in Salted, Peri Peri Masala, and Raw & Natural flavours, available to order online for delivery.
+          </p>
+          <Button className="mt-6" asChild>
+            <Link href="/dry-fruits-belgaum">Dry fruits delivery in Belagavi & Belgaum</Link>
+          </Button>
+        </div>
+      </section>
       <section className="section">
         <div className="container">
           <div className="flex items-end justify-between gap-5">

@@ -2,6 +2,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { BarChart3, Boxes, Inbox, LayoutDashboard, ShoppingCart, Tags, Users } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
+import { createMetadata } from "@/lib/seo";
+
+export const metadata = createMetadata({ title: "Admin", description: "Zunora store administration.", path: "/admin", noIndex: true });
 
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },

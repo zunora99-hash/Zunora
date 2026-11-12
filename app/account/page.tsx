@@ -3,6 +3,9 @@ import Link from "next/link";
 import { authOptions } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createMetadata } from "@/lib/seo";
+
+export const metadata = createMetadata({ title: "My account", description: "Manage your Zunora account and orders.", path: "/account", noIndex: true });
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
