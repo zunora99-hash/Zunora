@@ -40,7 +40,7 @@ Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in the same environment as the
 
 The URI must use the same scheme, hostname, and port as `NEXTAUTH_URL`. Add every environment you use to the same Google OAuth client; local and production redirect URIs can both be registered. For the local `.env` example using port 3001, add `http://localhost:3001/api/auth/callback/google`. For production on Vercel, this app uses the stable `VERCEL_PROJECT_PRODUCTION_URL` host so OAuth does not use a deployment-specific preview URL; add `https://zunora.vercel.app/api/auth/callback/google` for the current production domain. The deployed `GOOGLE_CLIENT_ID` must belong to this same OAuth client. Save the Google OAuth client settings, then restart locally or redeploy after changing environment variables.
 
-Checkout's map pin coordinates are stored with the delivery address. After applying the schema change, run `npm run db:push` against the target database before deploying checkout, then regenerate Prisma with `npm run db:generate` as part of the build.
+Checkout's map pin coordinates are stored with the delivery address. The additive SQL change is in `prisma/manual-migrations/20261113_add_address_coordinates.sql`; apply it to the target database before deploying code that writes coordinates. The production database has legacy objects not represented in the Prisma schema, so review `prisma migrate diff` before using `db:push` against it; a blind push would drop those objects.
 
 4. Create the database if needed, then generate Prisma and push the schema:
 
@@ -116,7 +116,7 @@ All replaceable brand values live in [config/site.ts](config/site.ts):
 - As an alternative or fallback, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and a verified `SMTP_FROM` address in `.env` (not `.env.example`). For Gmail SMTP, use `SMTP_HOST="smtp.gmail.com"`, `SMTP_PORT="465"` or `"587"`, the sending Gmail address as `SMTP_USER`, and a Google app password as `SMTP_PASS` (not the account password). Spaces in Gmail's grouped app-password display are ignored. Keep provider credentials private in `.env`, restart the app, and place a test COD order to verify delivery.
 - Configure fulfillment capacity before advertising the 12-hour dispatch estimate. For prepaid orders the estimate starts after successful payment; for COD orders it starts after order confirmation.
 - Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `RAZORPAY_WEBHOOK_SECRET`. Configure the provider webhook URL as `/api/razorpay` and subscribe to `payment.captured` and `payment.failed`.
-- Run `npm run db:push` after applying the order payment/email tracking schema changes, before deploying the new checkout.
+- For production schema changes, compare the live database with `prisma/schema.prisma` first and use reviewed, additive migrations. Do not run `npm run db:push` blindly against the current production database because its schema includes legacy objects absent from Prisma.
 - For a new production database, run `npm run db:push` and then `npm run db:seed` from a trusted environment with `DATABASE_URL` set to the Render External Database URL. `db:seed` initializes catalog data but does not create the demo admin unless `--demo-admin` is explicitly supplied. Back up existing production data before seeding because seeded catalog entries are updated to match the local catalog.
 - Test online payments in Razorpay test mode and configure automatic capture before accepting live payments.
 - Connect Cloudinary upload endpoints before enabling admin image uploads.

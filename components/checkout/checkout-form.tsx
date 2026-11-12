@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
@@ -96,6 +96,7 @@ export function CheckoutForm() {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [locating, setLocating] = useState(false);
   const [pinPosition, setPinPosition] = useState<Coordinates | null>(null);
+  const locationRequestId = useRef(0);
   const totals = useMemo(() => {
     const discount = coupon.toUpperCase() === "FRESH10" ? Math.round(items.reduce((sum, item) => sum + item.price * item.quantity, 0) * 0.1) : 0;
     return calculateTotals(items.map((item) => ({ price: item.price, quantity: item.quantity })), discount);
@@ -119,9 +120,13 @@ export function CheckoutForm() {
   }, [form, session?.user.email]);
 
   async function applyCoordinates(coordinates: Coordinates) {
+    const requestId = ++locationRequestId.current;
     setPinPosition(coordinates);
     form.setValue("address.latitude", coordinates.latitude, { shouldValidate: true });
     form.setValue("address.longitude", coordinates.longitude, { shouldValidate: true });
+    for (const field of ["line1", "line2", "city", "state", "postalCode"] as const) {
+      form.setValue(`address.${field}`, "", { shouldValidate: false });
+    }
 
     try {
       const query = new URLSearchParams({ lat: String(coordinates.latitude), lon: String(coordinates.longitude) });
@@ -129,6 +134,7 @@ export function CheckoutForm() {
       if (!response.ok) throw new Error("Address lookup is unavailable. Your pin is saved; enter the address fields manually.");
       const properties = getLocationProperties(await response.json());
       if (!properties) throw new Error("No address was found for this pin. Your pin is saved; enter the address fields manually.");
+      if (requestId !== locationRequestId.current) return;
 
       const address = {
         line1: [getLocationText(properties, "housenumber"), getLocationText(properties, "street")].filter(Boolean).join(" ") || getLocationText(properties, "name"),
@@ -143,6 +149,7 @@ export function CheckoutForm() {
       }
       toast({ title: "Map pin selected", description: "Review the filled address and adjust the pin if needed." });
     } catch (error) {
+      if (requestId !== locationRequestId.current) return;
       toast({
         title: "Pin saved; address needs review",
         description: error instanceof Error ? error.message : "Enter your address manually to continue."
@@ -160,9 +167,9 @@ export function CheckoutForm() {
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: false,
-          timeout: 15_000,
-          maximumAge: 60_000
+          enableHighAccuracy: true,
+          timeout: 20_000,
+          maximumAge: 0
         });
       });
       await applyCoordinates({ latitude: position.coords.latitude, longitude: position.coords.longitude });
@@ -306,7 +313,7 @@ export function CheckoutForm() {
               {locating ? "Finding location..." : "Use my location"}
             </Button>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">Allow location access to find your address, or search and pin it on the map. Review the address before ordering. Map tiles and address lookup use OpenStreetMap and Photon; the selected pin is saved with your delivery address.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Allow location access to find your address, or search and pin it on the map. Review the address before ordering. Street tiles use OpenStreetMap, satellite imagery uses Esri, and address search uses Photon. Your selected pin is saved with your delivery address.</p>
           <div className="mt-4">
             <LocationPickerMap position={pinPosition} onSelect={applyCoordinates} />
           </div>
