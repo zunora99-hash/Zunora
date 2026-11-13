@@ -8,23 +8,20 @@ import { getRazorpayClient } from "@/lib/razorpay";
 import { sendOrderConfirmationForOrder } from "@/lib/order-notifications";
 import { prisma } from "@/lib/prisma";
 import { checkoutSchema } from "@/lib/validations";
+import { enforceRateLimit } from "@/lib/rate-limit";
+import { readJsonBody } from "@/lib/request-body";
 
-function getDatabaseError(error: unknown) {
-  if (!error || typeof error !== "object") return { code: undefined, message: undefined };
-  const code = "code" in error && typeof error.code === "string" ? error.code : undefined;
-  const message = "message" in error && typeof error.message === "string" ? error.message : undefined;
-  return { code, message };
+function getDatabaseErrorCode(error: unknown) {
+  return error && typeof error === "object" && "code" in error && typeof error.code === "string" ? error.code : undefined;
 }
 
 export async function POST(request: Request) {
+  const limited = await enforceRateLimit(request, "checkout", 12, 15 * 60_000);
+  if (limited) return limited;
   const session = await getServerSession(authOptions);
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Checkout details are missing or invalid. Please refresh and try again." }, { status: 400 });
-  }
-  const parsed = checkoutSchema.safeParse(body);
+  const body = await readJsonBody(request, 16_384);
+  if (!body.ok) return NextResponse.json({ error: "Checkout details are missing or invalid. Please refresh and try again." }, { status: body.status });
+  const parsed = checkoutSchema.safeParse(body.value);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const enrichedItems: Array<{ product: CatalogProduct; variant: CatalogVariant; quantity: number }> = [];
@@ -114,22 +111,9 @@ export async function POST(request: Request) {
       });
     });
   } catch (error) {
-    const { code, message } = getDatabaseError(error);
-    const safeMessage = message?.replace(/postgres(?:ql)?:\/\/[^\s"'`]+/gi, "[redacted database URL]");
-    console.error(`Could not save order ${orderNumber}`, { code, message: safeMessage });
-    const databaseErrors: Record<string, string> = {
-      P1000: "The store database rejected its credentials. The store owner must check DATABASE_URL in Vercel.",
-      P1001: "The store cannot reach its database. The store owner must check the Render database status and DATABASE_URL in Vercel.",
-      P1002: "The store database connection timed out. Please try again later.",
-      P1003: "The store database is missing. Please contact the store owner.",
-      P1011: "The secure database connection failed. The store owner must check the SSL settings in DATABASE_URL.",
-      P2003: "The store catalog is not initialized correctly. Please contact the store owner.",
-      P2021: "The store database tables are missing. Please contact the store owner.",
-      P2022: "The store database schema is out of date. Please contact the store owner."
-    };
-    return NextResponse.json({
-      error: (code && databaseErrors[code]) || "We could not save your order. Please check the server logs and try again. If this keeps happening, contact support before submitting again."
-    }, { status: 503 });
+    const code = getDatabaseErrorCode(error);
+    console.error(`Could not save order ${orderNumber}`, { code });
+    return NextResponse.json({ error: "We could not save your order. Please try again later or contact support." }, { status: 503 });
   }
 
   if (order.paymentMethod === "RAZORPAY") {

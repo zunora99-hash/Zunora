@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 import { BarChart3, Boxes, Inbox, LayoutDashboard, ShoppingCart, Tags, Users } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { createMetadata } from "@/lib/seo";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/auth";
 
 export const metadata = createMetadata({ title: "Admin", description: "Zunora store administration.", path: "/admin", noIndex: true });
 
@@ -17,6 +20,12 @@ const nav = [
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  return <AdminGate>{children}</AdminGate>;
+}
+
+async function AdminGate({ children }: { children: ReactNode }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user.id || session.user.role !== "ADMIN") redirect("/login");
   return (
     <div className="container grid gap-6 py-8 lg:grid-cols-[250px_1fr]">
       <aside className="h-fit rounded-lg border bg-card p-4 lg:sticky lg:top-24">

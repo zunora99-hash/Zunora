@@ -281,3 +281,32 @@ export async function sendOrderConfirmation(input: OrderConfirmationInput) {
     throw error;
   }
 }
+
+export async function sendPasswordResetEmail(to: string, resetUrl: string) {
+  const host = process.env.SMTP_HOST?.trim();
+  const user = process.env.SMTP_USER?.trim();
+  const password = process.env.SMTP_PASS?.trim();
+  const from = process.env.SMTP_FROM?.trim();
+  const port = Number(process.env.SMTP_PORT ?? 587);
+  if (!host || !user || !password || !from || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error("Password reset email is not configured.");
+  }
+  const safeUrl = escapeHtml(resetUrl);
+  const normalizedPassword = host.toLowerCase() === "smtp.gmail.com" ? password.replace(/\s/g, "") : password;
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass: normalizedPassword },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000
+  });
+  await transporter.sendMail({
+    from: `${siteConfig.name} <${from}>`,
+    to,
+    subject: `${siteConfig.name} password reset`,
+    text: `Use this link to reset your password. It expires in 30 minutes. If you did not request this, ignore this email.\n\n${resetUrl}`,
+    html: `<p>We received a request to reset your ${escapeHtml(siteConfig.name)} password.</p><p><a href="${safeUrl}">Reset password</a></p><p>This link expires in 30 minutes. If you did not request this, ignore this email.</p>`
+  });
+}

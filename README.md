@@ -110,6 +110,7 @@ All replaceable brand values live in [config/site.ts](config/site.ts):
 - Verify the production domain as a Domain property in Google Search Console, submit `https://zunora.vercel.app/sitemap.xml`, and inspect/request indexing for the home page, `/dry-fruits-belgaum`, the shop page, and each product URL. The code publishes a sitemap and `robots.txt` already references it. A sitemap is a crawl hint, not an indexing or ranking guarantee.
 - Keep the public business name, phone, email, address, and site URL consistent across the Contact page, Organization structured data, and any public business listings. Create a Google Business Profile only if Zunora meets Google's in-person customer-contact eligibility; online-only businesses aren't eligible.
 - Set a strong `NEXTAUTH_SECRET`.
+- Backend protections now include PostgreSQL-backed request throttles, size-limited request parsing, bounded input validation, generic signup/reset responses, one-time hashed reset tokens that expire after 30 minutes, password-reset session revocation, 12-hour JWT sessions, current database role checks for admin pages, and security response headers including a restrictive CSP for framing, objects, base URLs, and form targets. These changes add `authVersion`, `RateLimitBucket`, and `PasswordResetToken`. Before deploying, back up the target database and review/apply `prisma/manual-migrations/20261114_backend_security.sql`; do not run `db:push` blindly on the existing production database. The app fails closed for throttled endpoints if the rate-limit table is missing. Configure SMTP for password-reset emails; they use SMTP rather than the order EmailJS template. New account passwords require 12 characters; existing accounts can still sign in with their current password. Existing sessions will need to sign in again after this migration.
 - To enable consent-based Google Analytics 4, set `NEXT_PUBLIC_GA_MEASUREMENT_ID` to your GA4 measurement ID (for example, `G-XXXXXXXXXX`). Analytics will not load until a visitor accepts analytics cookies; visitors can reject or change their choice through Cookie settings. If the variable is blank, analytics and the cookie prompt remain disabled.
 - For free-tier email delivery, create an EmailJS account, connect and verify an email service, then create an order-confirmation template. Set the template's **To Email** to `{{to_email}}`, its subject to `{{email_subject}}`, and its HTML body to `{{{invoice_html}}}`. For the plain-text body, use `{{invoice_text}}` if the template editor supports one. Add the service ID, template ID, and public key to `.env` as `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, and `EMAILJS_PUBLIC_KEY`. `EMAILJS_PRIVATE_KEY` is optional and can be set for server-side API authentication. These values are only read by the server; do not prefix them with `NEXT_PUBLIC_`. EmailJS is tried first when configured; if it fails, configured SMTP is tried automatically.
 - The invoice includes order items, shipping address, payment status, tax, shipping, discount, and total. Email delivery failures are logged and shown on the order confirmation page without discarding the order. The EmailJS REST API allows one send request per second and the free plan has a monthly quota, so check the current limits in your EmailJS account.
@@ -120,7 +121,37 @@ All replaceable brand values live in [config/site.ts](config/site.ts):
 - For a new production database, run `npm run db:push` and then `npm run db:seed` from a trusted environment with `DATABASE_URL` set to the Render External Database URL. `db:seed` initializes catalog data but does not create the demo admin unless `--demo-admin` is explicitly supplied. Back up existing production data before seeding because seeded catalog entries are updated to match the local catalog.
 - Test online payments in Razorpay test mode and configure automatic capture before accepting live payments.
 - Connect Cloudinary upload endpoints before enabling admin image uploads.
-- Deploy on Vercel or build with the included `Dockerfile`.
+- Deploy on Vercel or use the Docker + Nginx self-hosting path below. Nginx runs on a Linux VPS and proxies HTTPS requests to the Next.js server; it is not part of Vercel deployments.
+
+## Self-host with Docker and Nginx
+
+The backend is already in this Next.js application: `/api/*` route handlers implement authentication, checkout, orders, payments, product data, and admin actions. Prisma stores accounts, addresses, orders, and catalog data in PostgreSQL. Nginx is the public HTTPS reverse proxy; it does not replace the app backend or database.
+
+This path needs a Linux VPS with a public IPv4 address, Docker Compose, a domain you control, and a PostgreSQL database reachable from the VPS (managed PostgreSQL is recommended). Point the domain's DNS A record to the VPS. If the current site uses a `*.vercel.app` hostname, that hostname cannot be repointed; use a custom domain you control.
+
+1. Install Docker Engine with the Compose plugin, Nginx, and Certbot on the VPS. Open inbound ports 80 and 443 in the VPS firewall. Keep port 3000 private; Compose binds it to localhost.
+2. Copy the repository to the VPS and create `.env.production` beside `docker-compose.yml`. Start from `.env.example`, then set production values. This file is ignored by Git and Docker build context. At minimum set:
+
+   - `DATABASE_URL` to the production PostgreSQL URL, including `sslmode=require` when required by the database provider.
+   - `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to `https://your-domain.com` (no trailing slash).
+   - `NEXTAUTH_SECRET` to a private random value generated with `openssl rand -base64 32`.
+   - Google OAuth, Razorpay, SMTP/EmailJS, and Cloudinary values only for services you have enabled. Add `https://your-domain.com/api/auth/callback/google` to the Google OAuth client's authorized redirect URIs.
+
+   Never commit `.env.production` or paste production credentials into a README or example file. If any credential from an example file has ever been used for a real service, rotate it with that provider before deploying.
+3. Build the image and prepare the database. Only for a brand-new, empty database, apply the schema with `docker compose build web` followed by `docker compose run --rm web npx prisma db push`. For an existing production database, back it up, review additive SQL, and apply it with `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/manual-migrations/20261114_backend_security.sql`; also apply `20261113_add_address_coordinates.sql` if those columns are not already present. Do not blindly run `prisma db push` against a database with legacy objects. Seed catalog data only after reviewing what the seed updates (`docker compose run --rm web npm run db:seed`).
+4. Build and start the app:
+
+   ```bash
+   docker compose up -d --build
+   docker compose ps
+   docker compose logs -f web
+   ```
+
+   Verify `curl http://127.0.0.1:3000/api/health` on the VPS returns `{"status":"ok"}`. This endpoint is a liveness check; it does not verify PostgreSQL or payment-provider health.
+5. Obtain a TLS certificate before enabling the HTTPS Nginx config. Copy `deploy/nginx/bootstrap-http.conf` to `/etc/nginx/sites-available/zunora`, replace the example hostnames, then enable and load it with `sudo ln -s /etc/nginx/sites-available/zunora /etc/nginx/sites-enabled/zunora` and `sudo nginx -t && sudo systemctl reload nginx`. Run `sudo certbot --nginx -d your-domain.com -d www.your-domain.com` and confirm the certificate was issued. Then copy `deploy/nginx/zunora.conf` over the site file, replace every `example.com` with your real domain, and run `sudo nginx -t && sudo systemctl reload nginx`. If you do not use `www`, remove that hostname from `server_name` and Certbot commands.
+6. Point Google OAuth and payment webhooks at the production HTTPS domain. For Razorpay, configure `/api/razorpay` and the events documented in the production notes above. Confirm DNS, TLS renewal (`sudo certbot renew --dry-run`), order creation, email, and payment test mode before launch.
+
+For releases, pull the reviewed code and run `docker compose up -d --build`; keep PostgreSQL backups and retain the previous image/release so you can roll back. Do not put secrets in `docker-compose.yml`; keep them in the server-only `.env.production` file with restrictive permissions (`chmod 600 .env.production`).
 
 ## Useful commands
 

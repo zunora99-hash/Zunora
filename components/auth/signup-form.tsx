@@ -26,11 +26,11 @@ export function SignupForm() {
       if (!response.ok) {
         const description = typeof result.error === "string"
           ? result.error
-          : "Please check your name, email, and password (at least 8 characters).";
+          : "Please check your name, email, and password (at least 12 characters).";
         toast({ title: "Signup failed", description });
         return;
       }
-      toast({ title: "Account created", description: "You can now log in." });
+      toast({ title: "Request received", description: "If this email can create an account, you can now log in." });
       router.push("/login");
     } catch (error) {
       console.error("Signup request failed.", error);
@@ -42,7 +42,7 @@ export function SignupForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
       <Input placeholder="Full name" {...form.register("name")} />
       <Input type="email" placeholder="Email" {...form.register("email")} />
-      <Input type="password" placeholder="Password" {...form.register("password")} />
+      <Input type="password" autoComplete="new-password" placeholder="Password (12 characters minimum)" {...form.register("password")} />
       <Button type="submit" disabled={form.formState.isSubmitting}>{form.formState.isSubmitting ? "Creating..." : "Create account"}</Button>
     </form>
   );

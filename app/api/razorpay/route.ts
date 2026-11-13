@@ -2,9 +2,15 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { sendOrderConfirmationForOrder } from "@/lib/order-notifications";
 import { prisma } from "@/lib/prisma";
+import { readTextBody } from "@/lib/request-body";
 
 export async function POST(request: Request) {
-  const rawBody = await request.text();
+  if (request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !== "application/json") {
+    return NextResponse.json({ error: "Invalid webhook content type." }, { status: 415 });
+  }
+  const bodyResult = await readTextBody(request, 256 * 1024);
+  if (!bodyResult.ok) return NextResponse.json({ error: bodyResult.error }, { status: bodyResult.status });
+  const rawBody = bodyResult.text;
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
   const signature = request.headers.get("x-razorpay-signature");
   if (!secret) return NextResponse.json({ error: "Webhook verification is not configured." }, { status: 503 });

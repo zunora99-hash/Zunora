@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { authOptions } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,7 @@ export const metadata = createMetadata({ title: "My account", description: "Mana
 
 export default async function AccountPage() {
   const session = await getServerSession(authOptions);
+  if (!session?.user.id) redirect("/login");
 
   return (
     <div className="container py-10">

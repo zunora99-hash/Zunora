@@ -4,8 +4,8 @@ export default withAuth({
   callbacks: {
     authorized({ token, req }) {
       const path = req.nextUrl.pathname;
-      if (path.startsWith("/admin")) return token?.role === "ADMIN";
-      if (path.startsWith("/account")) return Boolean(token);
+      if (path.startsWith("/admin")) return Boolean(token?.sub) && token?.role === "ADMIN";
+      if (path.startsWith("/account")) return Boolean(token?.sub);
       return true;
     }
   }

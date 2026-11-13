@@ -6,16 +6,22 @@ import { authOptions } from "@/auth";
 import { sendOrderConfirmationForOrder } from "@/lib/order-notifications";
 import { prisma } from "@/lib/prisma";
 import { getRazorpayClient } from "@/lib/razorpay";
+import { enforceRateLimit } from "@/lib/rate-limit";
+import { readJsonBody } from "@/lib/request-body";
 
 const verificationSchema = z.object({
-  orderNumber: z.string().min(1),
-  razorpay_order_id: z.string().min(1),
-  razorpay_payment_id: z.string().min(1),
+  orderNumber: z.string().min(1).max(64),
+  razorpay_order_id: z.string().min(1).max(128),
+  razorpay_payment_id: z.string().min(1).max(128),
   razorpay_signature: z.string().regex(/^[a-f\d]{64}$/i)
 });
 
 export async function POST(request: Request) {
-  const parsed = verificationSchema.safeParse(await request.json());
+  const limited = await enforceRateLimit(request, "payment-verify", 20, 15 * 60_000);
+  if (limited) return limited;
+  const body = await readJsonBody(request, 4_096);
+  if (!body.ok) return NextResponse.json({ error: body.error }, { status: body.status });
+  const parsed = verificationSchema.safeParse(body.value);
   if (!parsed.success) return NextResponse.json({ error: "Invalid payment details." }, { status: 400 });
 
   const { orderNumber, razorpay_order_id, razorpay_payment_id, razorpay_signature } = parsed.data;
