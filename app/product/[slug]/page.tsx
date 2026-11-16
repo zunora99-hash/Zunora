@@ -20,7 +20,7 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
     description: `${product.description} Order online from Zunora in Belagavi (Belgaum) or elsewhere in India.`,
     path: `/product/${product.slug}`,
     image: product.images[0],
-    keywords: [product.name, "buy cashews online", "Zunora dry fruits", "25 g cashew pack"]
+    keywords: [product.name, "buy cashews online", "Zunora dry fruits", product.tags.includes("jar") ? "30 g cashew jar" : "25 g cashew pack"]
   });
 }
 
@@ -63,10 +63,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   return (
     <div className="container py-10">
       <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
-        <Link href="/" className="hover:underline">Home</Link> / <Link href="/shop?category=cashews" className="hover:underline">Cashew packs</Link> / <span className="text-foreground">{product.name}</span>
+        <Link href="/" className="hover:underline">Home</Link> / <Link href="/shop?category=cashews" className="hover:underline">Cashew jars & packs</Link> / <span className="text-foreground">{product.name}</span>
       </nav>
       <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_0.9fr]">
-        <ProductGallery images={product.images} video={product.video} name={product.name} />
+        <ProductGallery images={product.images} video={product.video} name={product.name} interactive3d={product.tags.includes("interactive-3d")} />
         <div>
           <Badge>{product.category}</Badge>
           <h1 className="mt-4 font-serif text-5xl font-bold leading-tight">{product.name}</h1>

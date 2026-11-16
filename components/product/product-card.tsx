@@ -21,12 +21,13 @@ export function ProductCard({ product, index = 0 }: { product: CatalogProduct; i
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: Math.min(index * 0.04, 0.24) }}
-      className="group overflow-hidden rounded-lg border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-soft"
+      className="group overflow-hidden rounded-2xl border border-cacao/10 bg-card shadow-[0_12px_35px_-25px_rgba(61,38,24,0.4)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_26px_55px_-28px_rgba(61,38,24,0.38)]"
     >
       <Link href={`/product/${product.slug}`} className="block">
         <div className="relative aspect-[2/3] overflow-hidden bg-[#f8efe0]">
           <Image src={product.images[0]} alt={`${product.name} pack`} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-contain transition duration-500 group-hover:scale-[1.02]" />
-          {product.featured ? <Badge className="absolute left-3 top-3">Available now</Badge> : null}
+          {product.featured ? <Badge className="absolute left-3 top-3">{product.tags.includes("jar") ? "New" : "Available now"}</Badge> : null}
+          {product.tags.includes("interactive-3d") ? <Badge className="absolute right-3 top-3 bg-cacao text-white">3D view</Badge> : null}
         </div>
       </Link>
       <div className="p-4">
@@ -41,7 +42,7 @@ export function ProductCard({ product, index = 0 }: { product: CatalogProduct; i
         <div className="mt-4 flex items-end justify-between gap-3">
           <div>
             <p className="font-serif text-2xl font-bold">{formatPrice(variant.price)}</p>
-            <p className="text-xs text-muted-foreground">{variant.label} pack</p>
+            <p className="text-xs text-muted-foreground">{variant.label} {product.tags.includes("jar") ? "jar" : "pack"}</p>
           </div>
           <Button
             size="icon"

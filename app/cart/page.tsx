@@ -63,7 +63,7 @@ export default function CartPage() {
         <div className="grid min-h-96 place-items-center text-center">
           <div>
             <h2 className="font-serif text-3xl font-bold">Your cart is empty</h2>
-            <p className="mt-2 text-muted-foreground">Browse Zunora 25 g cashew packs.</p>
+            <p className="mt-2 text-muted-foreground">Browse Zunora cashew jars and snack packs.</p>
             <Button className="mt-5" asChild><Link href="/shop">Shop now</Link></Button>
           </div>
         </div>

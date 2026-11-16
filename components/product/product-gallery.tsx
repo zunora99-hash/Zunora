@@ -1,15 +1,56 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { RotateCcw, RotateCw } from "lucide-react";
+import { useRef, useState, type PointerEvent } from "react";
 import { cn } from "@/lib/utils";
 
-export function ProductGallery({ images, video, name }: { images: string[]; video?: string; name: string }) {
+type DragStart = { x: number; y: number; rotateX: number; rotateY: number };
+
+export function ProductGallery({ images, video, name, interactive3d = false }: { images: string[]; video?: string; name: string; interactive3d?: boolean }) {
   const [active, setActive] = useState<"image" | "video">("image");
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const dragStart = useRef<DragStart | null>(null);
+
+  function onPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (!interactive3d || active !== "image") return;
+    dragStart.current = { x: event.clientX, y: event.clientY, rotateX: rotation.x, rotateY: rotation.y };
+    setDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function onPointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (!dragStart.current) return;
+    const start = dragStart.current;
+    const horizontalDrag = event.clientX - start.x;
+    const verticalDrag = event.clientY - start.y;
+    setRotation({
+      x: event.pointerType === "mouse" ? Math.max(-12, Math.min(12, start.rotateX - verticalDrag * 0.18)) : 0,
+      y: Math.max(-32, Math.min(32, start.rotateY + horizontalDrag * 0.22))
+    });
+  }
+
+  function endPointerDrag() {
+    dragStart.current = null;
+    setDragging(false);
+  }
 
   return (
     <div className="[perspective:1400px]">
-      <div className="relative aspect-[2/3] overflow-hidden rounded-lg border bg-[#f8efe0] shadow-[0_24px_55px_-30px_rgba(61,38,24,0.55)] transition-transform duration-500 ease-out hover:[transform:rotateY(-3deg)_rotateX(1deg)_translateY(-3px)]">
+      <div
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endPointerDrag}
+        onPointerCancel={endPointerDrag}
+        role={interactive3d ? "group" : undefined}
+        className={cn(
+          "relative aspect-[2/3] overflow-hidden rounded-2xl border bg-[#f8efe0] shadow-[0_24px_55px_-30px_rgba(61,38,24,0.55)] transition-transform duration-500 ease-out",
+          interactive3d ? "touch-pan-y cursor-grab active:cursor-grabbing" : "hover:[transform:rotateY(-3deg)_rotateX(1deg)_translateY(-3px)]"
+        )}
+        style={interactive3d ? { transform: `perspective(1100px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`, transitionDuration: dragging ? "0ms" : "350ms" } : undefined}
+        aria-label={interactive3d ? `${name}. Drag horizontally to rotate the product view.` : undefined}
+      >
         {active === "video" && video ? (
           <video
             key={video}
@@ -26,7 +67,23 @@ export function ProductGallery({ images, video, name }: { images: string[]; vide
           <Image src={images[0]} alt={`${name} product image`} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-contain" />
         )}
       </div>
-      <div className="mt-4 grid grid-cols-4 gap-3">
+      {interactive3d ? (
+        <div className="mt-3 flex items-center justify-between rounded-xl border bg-card px-3 py-2.5">
+          <p className="text-xs font-medium text-muted-foreground">Drag image to rotate in 3D</p>
+          <div className="flex gap-1">
+            <button type="button" onClick={() => setRotation((value) => ({ ...value, y: Math.max(-32, value.y - 12) }))} className="grid h-9 w-9 place-items-center rounded-lg transition hover:bg-muted" aria-label="Rotate product left">
+              <RotateCcw className="h-4 w-4" />
+            </button>
+            <button type="button" onClick={() => setRotation((value) => ({ ...value, y: Math.min(32, value.y + 12) }))} className="grid h-9 w-9 place-items-center rounded-lg transition hover:bg-muted" aria-label="Rotate product right">
+              <RotateCw className="h-4 w-4" />
+            </button>
+            <button type="button" onClick={() => setRotation({ x: 0, y: 0 })} className="rounded-lg px-2 text-xs font-semibold transition hover:bg-muted" aria-label="Reset product rotation">
+              Reset
+            </button>
+          </div>
+        </div>
+      ) : null}
+      {images.length > 1 || video ? <div className="mt-4 grid grid-cols-4 gap-3">
         {images.map((image, index) => (
           <button
             key={`${image}-${index}`}
@@ -53,7 +110,7 @@ export function ProductGallery({ images, video, name }: { images: string[]; vide
             </span>
           </button>
         ) : null}
-      </div>
+      </div> : null}
     </div>
   );
 }

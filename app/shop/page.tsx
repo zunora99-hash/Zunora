@@ -7,10 +7,10 @@ import { filterProducts, storefrontCategories } from "@/lib/catalog";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Shop Zunora Dry Fruits in Belagavi | Cashew Packs",
-  description: "Order Zunora 25 g cashew packs online in Belagavi (Belgaum) and across India. Choose Salted, Peri Peri Masala, or Raw & Natural for ₹40 each.",
+  title: "Shop Zunora Dry Fruits in Belagavi | Cashew Jars & Packs",
+  description: "Order Zunora cashew jars and snack packs online in Belagavi (Belgaum) and across India. Shop 30 g jars for ₹59 and 25 g packs from ₹40.",
   path: "/shop",
-  image: "/products/zunora-salted-cashew-25g.png",
+  image: "/products/zunora-salted-cashew-jar-30g.webp",
   keywords: ["buy cashews online", "dry fruits Belagavi", "dry fruits Belgaum", "Zunora cashew packs", "25 g cashew"]
 });
 
@@ -36,8 +36,8 @@ export default function ShopPage({ searchParams }: { searchParams: ShopParams })
       <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="eyebrow">Shop</p>
-          <h1 className="mt-2 font-serif text-5xl font-bold">Shop Zunora cashew packs</h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">Order online from Belagavi (Belgaum) or elsewhere in India. Three 25 g cashew flavours are available for ₹40 each, with one free 15 g Pista & Cashew Mix for each eligible pack during this limited-time offer.</p>
+          <h1 className="mt-2 font-serif text-5xl font-bold">Shop Zunora cashews</h1>
+          <p className="mt-3 max-w-2xl text-muted-foreground">Order online from Belagavi (Belgaum) or elsewhere in India. Explore four 30 g jar flavours for ₹59 each and 25 g snack packs from ₹40. The current free gift offer applies to eligible 25 g packs.</p>
         </div>
         <p className="text-sm font-semibold text-muted-foreground">{selected.length} products</p>
       </div>

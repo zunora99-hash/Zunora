@@ -2,7 +2,7 @@ import { slugify } from "@/lib/utils";
 
 export type CatalogVariant = {
   id: string;
-  label: "15g" | "25g" | "250g" | "500g" | "1kg";
+  label: "15g" | "25g" | "30g" | "250g" | "500g" | "1kg";
   weightG: number;
   price: number;
   mrp: number;
@@ -53,7 +53,7 @@ export const categories: StoreCategory[] = [
   {
     name: "Cashews",
     slug: "cashews",
-    description: "Shop Zunora 25 g cashew snack packs.",
+    description: "Shop Zunora 30 g cashew jars and 25 g snack packs.",
     image: "/products/zunora-salted-cashew-25g.png",
     storefront: true
   },
@@ -227,7 +227,36 @@ const launchProducts: CatalogProduct[] = [
   }
 ];
 
-export const products: CatalogProduct[] = [...legacyProducts, ...launchProducts];
+function createJarProduct(slug: string, name: string, image: string, shortDescription: string, productDetails: string): CatalogProduct {
+  return {
+    id: `prod_${slug.replace(/-/g, "_")}`,
+    name,
+    slug,
+    category: "Cashews",
+    categorySlug: "cashews",
+    description: `Zunora ${name}: ${productDetails} Read the package for ingredient, allergen, and nutrition information.`,
+    shortDescription,
+    images: [image],
+    rating: 0,
+    reviewCount: 0,
+    featured: true,
+    availableForSale: true,
+    tags: ["cashews", "30g", "jar", "interactive-3d"],
+    nutrition: {},
+    ingredients: "Refer to the product packaging.",
+    origin: "Refer to the product packaging.",
+    variants: [{ id: `${slug}-30g-jar`, label: "30g", weightG: 30, price: 59, mrp: 59, stock: 50 }]
+  };
+}
+
+const jarProducts: CatalogProduct[] = [
+  createJarProduct("zunora-cashew-nuts-jar-30g", "Zunora Cashew Nuts Jar (30 g)", "/products/zunora-cashew-nuts-jar-30g.webp", "Whole, natural cashews in a 30 g jar.", "whole natural cashews in a crunchy 30 g jar."),
+  createJarProduct("zunora-salted-cashew-jar-30g", "Zunora Salted Cashew Jar (30 g)", "/products/zunora-salted-cashew-jar-30g.webp", "Lightly salted cashews in a 30 g jar.", "roasted, lightly salted cashews in a 30 g jar."),
+  createJarProduct("zunora-peri-peri-cashew-jar-30g", "Zunora Peri Peri Masala Cashew Jar (30 g)", "/products/zunora-peri-peri-cashew-jar-30g.webp", "Peri Peri masala cashews in a 30 g jar.", "flavoured Peri Peri masala cashews in a 30 g jar."),
+  createJarProduct("zunora-pudina-cashew-mix-jar-30g", "Zunora Pudina Cashew Mix Jar (30 g)", "/products/zunora-pudina-cashew-mix-jar-30g.webp", "Pudina cashew mix in a 30 g jar.", "flavoured Pudina cashews in a 30 g jar.")
+];
+
+export const products: CatalogProduct[] = [...legacyProducts, ...jarProducts, ...launchProducts];
 export const storefrontProducts = products.filter((product) => product.availableForSale);
 export const freeGiftProduct = products.find((product) => product.freeGiftOnly);
 

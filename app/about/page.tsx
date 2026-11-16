@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Leaf, ShieldCheck, Sprout } from "lucide-react";
 import { createMetadata } from "@/lib/seo";
 
-export const metadata = createMetadata({ title: "About Zunora | Dry Fruits in Belagavi", description: "Learn about Zunora, a Belagavi-based online dry fruits brand offering cashew snack packs to customers in Belgaum and across India.", path: "/about" });
+export const metadata = createMetadata({ title: "About Zunora | Dry Fruits in Belagavi", description: "Learn about Zunora, a Belagavi-based online dry fruits brand offering cashew jars and snack packs to customers in Belgaum and across India.", path: "/about" });
 
 const values = [
   { title: "Sourcing", icon: Sprout, copy: "Supplier checks and product-specific quality specs." },

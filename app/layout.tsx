@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: `${siteConfig.name} | ${siteConfig.tagline}`,
     template: "%s"
   },
-  description: "Shop Zunora 25 g cashew snack packs online in Belagavi (Belgaum) and across India. Choose Salted, Peri Peri Masala, or Raw & Natural Cashew.",
+  description: "Shop Zunora cashew jars and snack packs online in Belagavi (Belgaum) and across India. Explore 30 g jars for ₹59 and 25 g packs from ₹40.",
   applicationName: siteConfig.name,
   icons: { icon: "/favicon.svg" }
 };

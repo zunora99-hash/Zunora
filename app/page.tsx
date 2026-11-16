@@ -9,24 +9,42 @@ import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
   title: "Dry Fruits in Belagavi (Belgaum) | Zunora",
-  description: "Looking for dry fruits in Belagavi or Belgaum? Shop Zunora 25 g cashew packs online, with Salted, Peri Peri Masala, and Raw & Natural flavours.",
+  description: "Shop dry fruits online from Zunora in Belagavi (Belgaum), Karnataka. Explore 30 g cashew jars for ₹59 and 25 g snack packs in three flavours.",
   path: "/",
-  image: "/products/zunora-salted-cashew-25g.png",
-  keywords: ["dry fruits Belagavi", "dry fruits Belgaum", "Zunora dry fruits", "buy cashews online", "cashew snacks"]
+  image: "/products/zunora-salted-cashew-jar-30g.webp",
+  keywords: ["dry fruits in Belagavi", "dry fruits in Belgaum", "buy dry fruits online Belagavi", "Zunora dry fruits", "cashews Belagavi"]
 });
 
 export default function HomePage() {
-  const bestSellers = storefrontProducts.filter((product) => product.featured);
+  const jarProducts = storefrontProducts.filter((product) => product.tags.includes("jar"));
+  const bestSellers = storefrontProducts.filter((product) => product.featured && !product.tags.includes("jar"));
 
   return (
     <>
       <Hero />
+      <section className="section bg-cacao text-white">
+        <div className="container">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e7bf72]">New · 30 g jars</p>
+              <h2 className="mt-2 font-serif text-3xl font-bold md:text-4xl">Cashew favourites, jarred.</h2>
+              <p className="mt-2 max-w-2xl text-sm text-white/75">Choose from four Zunora cashew jar flavours, each ₹59.</p>
+            </div>
+            <Button variant="outline" asChild className="w-fit border-white/40 text-white hover:bg-white/10 hover:text-white">
+              <Link href="/shop?category=cashews">Shop all cashews <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
+          </div>
+          <div className="mt-7 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            {jarProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
+          </div>
+        </div>
+      </section>
       <section className="section bg-white/45">
         <div className="container mx-auto max-w-4xl text-center">
           <p className="eyebrow">Belagavi · Belgaum</p>
           <h2 className="mt-2 font-serif text-4xl font-bold">Dry fruits in Belagavi, also known as Belgaum</h2>
           <p className="mx-auto mt-4 max-w-3xl text-muted-foreground">
-            Zunora is based in Belagavi, Karnataka, and sells dry fruit snacks online. Our current range features 25 g cashew packs in Salted, Peri Peri Masala, and Raw & Natural flavours, available to order online for delivery.
+            Zunora is based in Belagavi, Karnataka, and sells dry fruit snacks online. Choose from 30 g cashew jars and 25 g snack packs, available to order online for delivery.
           </p>
           <Button className="mt-6" asChild>
             <Link href="/dry-fruits-belgaum">Dry fruits delivery in Belagavi & Belgaum</Link>
@@ -114,13 +132,13 @@ export default function HomePage() {
         <div className="container">
           <p className="eyebrow text-center">Shop with confidence</p>
           <h2 className="mt-2 text-center font-serif text-4xl font-bold">Clear packs. Simple prices.</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">Choose from three 25 g Zunora cashew packs for ₹40 each. Review the product packaging for ingredients, allergens, and nutrition information before consuming.</p>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">Choose 25 g snack packs from ₹40 or 30 g jars for ₹59. Review each product package for ingredients, allergens, and nutrition information before consuming.</p>
         </div>
       </section>
       <section className="section">
         <div className="container grid gap-5 md:grid-cols-2">
           {[
-            ["Which cashew packs can I buy?", "Zunora Salted Cashew, Peri Peri Masala Cashew, and Raw & Natural Cashew are available in 25 g packs for ₹40 each."],
+            ["Which cashew products can I buy?", "Zunora offers four 30 g cashew jar flavours for ₹59 each, plus Salted, Peri Peri Masala, and Raw & Natural 25 g snack packs for ₹40 each."],
             ["How does the free gift work?", "One 15 g Pista & Cashew Mix is added automatically for each eligible 25 g cashew pack during this limited-time offer."],
             ["Are almonds available?", "Zunora almonds are coming soon."],
             ["Where can I check ingredients and allergens?", "Please read the information printed on each product package."]

@@ -80,7 +80,7 @@ export function CartDrawer() {
               <div className="grid h-full place-items-center text-center">
                 <div>
                   <p className="font-serif text-2xl font-semibold">Your basket is empty</p>
-                  <p className="mt-2 text-sm text-muted-foreground">Add a Zunora 25 g cashew pack to your basket.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Add a Zunora cashew jar or snack pack to your basket.</p>
                   <Button className="mt-5" asChild onClick={() => setDrawerOpen(false)}>
                     <Link href="/shop">Start shopping</Link>
                   </Button>

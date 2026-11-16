@@ -7,11 +7,11 @@ import { createMetadata } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/utils";
 
 export const metadata = createMetadata({
-  title: "Dry Fruits in Belagavi (Belgaum) | Order Zunora Online",
-  description: "Shop Zunora dry fruit snacks online in Belagavi, also known as Belgaum. Browse 25 g cashew packs, delivery details, and current offers.",
+  title: "Buy Dry Fruits Online in Belagavi & Belgaum | Zunora",
+  description: "Order dry fruits online from Zunora in Belagavi (Belgaum), Karnataka. Shop 30 g cashew jars for ₹59, 25 g snack packs, and delivery information.",
   path: "/dry-fruits-belgaum",
-  image: "/products/zunora-salted-cashew-25g.png",
-  keywords: ["dry fruits in Belagavi", "dry fruits in Belgaum", "cashews Belagavi", "Zunora"]
+  image: "/products/zunora-salted-cashew-jar-30g.webp",
+  keywords: ["dry fruits shop Belagavi", "dry fruits delivery Belagavi", "buy dry fruits online Belgaum", "cashews Belagavi", "Zunora"]
 });
 
 export default function BelagaviDryFruitsPage() {
@@ -34,7 +34,7 @@ export default function BelagaviDryFruitsPage() {
             Dry fruits in Belagavi (Belgaum), from Zunora
           </h1>
           <p className="mt-5 max-w-3xl text-lg text-muted-foreground">
-            Zunora is a Belagavi-based online dry fruits brand. Shop our current range of 25 g cashew snack packs in Salted, Peri Peri Masala, and Raw & Natural flavours. Belagavi is also known as Belgaum, and both names refer to the city we call home.
+            Zunora is a Belagavi-based online dry fruits brand. Shop 30 g cashew jars and 25 g snack packs in a range of flavours. Belagavi is also known as Belgaum, and both names refer to the city we call home.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button size="lg" asChild>
@@ -50,9 +50,9 @@ export default function BelagaviDryFruitsPage() {
       <section id="cashew-packs" className="section scroll-mt-24">
         <div className="container">
           <p className="eyebrow">Available online</p>
-          <h2 className="mt-2 font-serif text-4xl font-bold">Zunora 25 g cashew packs</h2>
+          <h2 className="mt-2 font-serif text-4xl font-bold">Zunora cashew jars and 25 g packs</h2>
           <p className="mt-3 max-w-3xl text-muted-foreground">
-            Each available pack is ₹40. During the current offer, one 15 g Pista & Cashew Mix is added free for each eligible cashew pack at checkout. Check the package for ingredients, allergens, and nutrition information.
+            Zunora 30 g cashew jars are ₹59 each, and 25 g snack packs are ₹40 each. During the current offer, one 15 g Pista & Cashew Mix is added free for each eligible 25 g pack at checkout. Check each package for ingredients, allergens, and nutrition information.
           </p>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
@@ -69,7 +69,7 @@ export default function BelagaviDryFruitsPage() {
               Add the packs you want to your cart and enter your delivery address at checkout. Delivery is free for orders of ₹100 or more; orders below ₹100 have a ₹25 delivery charge. Available payment methods are shown at checkout.
             </p>
             <p className="mt-4 text-muted-foreground">
-              The store currently focuses on compact cashew snack packs. Other dry fruit ranges will be listed here when they become available.
+              The store currently focuses on cashews in jars and compact snack packs. Other dry fruit ranges will be listed here when they become available.
             </p>
           </div>
           <div>
@@ -81,7 +81,7 @@ export default function BelagaviDryFruitsPage() {
               </details>
               <details className="rounded-lg border bg-card p-4">
                 <summary className="cursor-pointer font-semibold">What dry fruits can I order now?</summary>
-                <p className="mt-2 text-sm text-muted-foreground">Zunora currently offers Salted, Peri Peri Masala, and Raw & Natural cashew snack packs in 25 g sizes.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Zunora offers 30 g Cashew Nuts, Salted Cashew, Peri Peri Masala Cashew, and Pudina Cashew Mix jars for ₹59 each, plus 25 g Salted, Peri Peri Masala, and Raw & Natural cashew packs for ₹40 each.</p>
               </details>
               <details className="rounded-lg border bg-card p-4">
                 <summary className="cursor-pointer font-semibold">How much does delivery cost?</summary>

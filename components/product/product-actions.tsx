@@ -40,7 +40,7 @@ export function ProductActions({ product }: { product: CatalogProduct }) {
           </div>
         </>
       ) : (
-        <p className="text-sm font-semibold">{selected.label} pack</p>
+        <p className="text-sm font-semibold">{selected.label} {product.tags.includes("jar") ? "jar" : "pack"}</p>
       )}
       {product.eligibleForFreeGift ? (
         <p className="mt-3 rounded-md bg-olive/5 p-3 text-sm text-olive">
