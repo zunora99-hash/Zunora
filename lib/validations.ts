@@ -67,6 +67,11 @@ export const checkoutSchema = z.object({
     .max(25)
 });
 
+export const loyaltyRegistrationSchema = z.object({
+  name: z.string().trim().min(2, "Enter your name").max(100),
+  phone: z.string().trim().min(8, "Enter a valid mobile number").max(30)
+});
+
 export const newsletterSchema = z.object({
   email: z.string().trim().email().max(254).transform((email) => email.toLowerCase())
 });

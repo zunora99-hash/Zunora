@@ -93,14 +93,18 @@ export function CheckoutForm() {
   const items = useCartStore((state) => state.items);
   const clear = useCartStore((state) => state.clear);
   const [coupon, setCoupon] = useState("");
+  const [couponPercent, setCouponPercent] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [locating, setLocating] = useState(false);
   const [pinPosition, setPinPosition] = useState<Coordinates | null>(null);
   const locationRequestId = useRef(0);
   const totals = useMemo(() => {
-    const discount = coupon.toUpperCase() === "FRESH10" ? Math.round(items.reduce((sum, item) => sum + item.price * item.quantity, 0) * 0.1) : 0;
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const discount = couponApplied ? Math.round(subtotal * couponPercent / 100) : 0;
     return calculateTotals(items.map((item) => ({ price: item.price, quantity: item.quantity })), discount);
-  }, [coupon, items]);
+  }, [couponApplied, couponPercent, items]);
   const freeGiftQuantity = getFreeGiftQuantity(items);
 
   const form = useForm<FormValues>({
@@ -187,6 +191,38 @@ export function CheckoutForm() {
     }
   }
 
+  async function applyCoupon() {
+    const code = coupon.trim().toUpperCase();
+    if (!code) {
+      toast({ title: "Enter a code", description: "Enter your scratch card or coupon code first." });
+      return;
+    }
+    setApplyingCoupon(true);
+    try {
+      const response = await fetch("/api/loyalty/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, phone: form.getValues("address.phone") })
+      });
+      const data = await response.json() as { eligible?: boolean; discountPercent?: number; error?: string };
+      if (!response.ok) throw new Error(data.error ?? "Could not check your reward.");
+      if (!data.eligible || !data.discountPercent) {
+        setCouponApplied(false);
+        setCouponPercent(0);
+        toast({ title: "Code not valid", description: "Check the code and use the same mobile number you registered with." });
+        return;
+      }
+      setCoupon(code);
+      setCouponPercent(data.discountPercent);
+      setCouponApplied(true);
+      toast({ title: `${data.discountPercent}% discount applied`, description: "Your discount will be confirmed when the order is placed." });
+    } catch (error) {
+      toast({ title: "Could not apply code", description: error instanceof Error ? error.message : "Please try again." });
+    } finally {
+      setApplyingCoupon(false);
+    }
+  }
+
   async function onSubmit(values: FormValues) {
     if (!items.length) {
       toast({ title: "Cart is empty", description: "Add a product before checkout." });
@@ -194,7 +230,7 @@ export function CheckoutForm() {
     }
     const payload = {
       ...values,
-      couponCode: coupon,
+      couponCode: couponApplied ? coupon : "",
       items: items.map((item) => ({ productId: item.productId, variantId: item.variantId, quantity: item.quantity }))
     };
     try {
@@ -319,7 +355,19 @@ export function CheckoutForm() {
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <Input placeholder="Full name" {...form.register("address.name")} />
-            <Input placeholder="Phone" {...form.register("address.phone")} />
+            <Input
+              placeholder="Phone"
+              type="tel"
+              inputMode="tel"
+              {...form.register("address.phone", {
+                onChange: () => {
+                  if (coupon.toUpperCase().startsWith("ZUN5-")) {
+                    setCouponApplied(false);
+                    setCouponPercent(0);
+                  }
+                }
+              })}
+            />
             <Input className="md:col-span-2" placeholder="Address line 1" {...form.register("address.line1")} />
             <Input className="md:col-span-2" placeholder="Address line 2" {...form.register("address.line2")} />
             <Input placeholder="City" {...form.register("address.city")} />
@@ -368,9 +416,11 @@ export function CheckoutForm() {
           ) : null}
         </div>
         <div className="mt-5 flex gap-2">
-          <Input value={coupon} onChange={(event) => setCoupon(event.target.value)} placeholder="Coupon code" />
-          <Button type="button" variant="outline" onClick={() => setCoupon(coupon.trim().toUpperCase())}>Apply</Button>
+          <Input value={coupon} onChange={(event) => { setCoupon(event.target.value); setCouponApplied(false); setCouponPercent(0); }} placeholder="Scratch card or coupon code" />
+          <Button type="button" variant="outline" onClick={applyCoupon} disabled={applyingCoupon}>{applyingCoupon ? "Checking..." : "Apply"}</Button>
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">Scratch card codes must be used with the mobile number entered above.</p>
+        {couponApplied ? <p className="mt-2 text-sm font-medium text-olive">{couponPercent}% discount applied. Discounts cannot be combined.</p> : null}
         <p className="mt-3 text-xs text-muted-foreground">Orders of ₹100 or more get free delivery. Orders below ₹100 have a ₹25 delivery charge.</p>
         <div className="mt-5 grid gap-2 border-t pt-5 text-sm">
           <SummaryLine label="Subtotal" value={totals.subtotal} />

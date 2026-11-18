@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import { checkoutSchema } from "@/lib/validations";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { readJsonBody } from "@/lib/request-body";
+import { normalizePhoneNumber } from "@/lib/loyalty";
 
 function getDatabaseErrorCode(error: unknown) {
   return error && typeof error === "object" && "code" in error && typeof error.code === "string" ? error.code : undefined;
@@ -35,7 +36,27 @@ export async function POST(request: Request) {
   }
 
   const subtotalItems = enrichedItems.map((item) => ({ price: item.variant.price, quantity: item.quantity }));
-  const discount = parsed.data.couponCode?.toUpperCase() === "FRESH10" ? Math.round(calculateTotals(subtotalItems).subtotal * 0.1) : 0;
+  const subtotal = calculateTotals(subtotalItems).subtotal;
+  const enteredCoupon = parsed.data.couponCode?.trim().toUpperCase();
+  const hasCoupon = enteredCoupon === "FRESH10";
+  const rewardPhone = normalizePhoneNumber(parsed.data.address.phone);
+  const rewardMatches = !hasCoupon && enteredCoupon && rewardPhone && /^ZUN5-[A-F0-9]{16}$/.test(enteredCoupon)
+    ? await prisma.$queryRaw<Array<{ id: string }>>`
+        SELECT "id" FROM "LoyaltyCustomer"
+        WHERE "rewardCode" = ${enteredCoupon} AND "phoneNormalized" = ${rewardPhone} AND "rewardRedeemedAt" IS NULL
+        LIMIT 1
+      `
+    : [];
+  if (enteredCoupon && !hasCoupon && rewardMatches.length === 0) {
+    return NextResponse.json({ error: "This scratch card code is invalid or has already been used." }, { status: 400 });
+  }
+  const loyaltyCustomerId = rewardMatches[0]?.id;
+  const discount = hasCoupon
+    ? Math.round(subtotal * 0.1)
+    : loyaltyCustomerId
+      ? Math.round(subtotal * 0.05)
+      : 0;
+  const appliedCouponCode = hasCoupon ? "FRESH10" : loyaltyCustomerId ? "LOYALTY5" : undefined;
   const totals = calculateTotals(subtotalItems, discount);
   const giftQuantity = getFreeGiftQuantity(parsed.data.items);
   if (giftQuantity && !freeGiftProduct) {
@@ -70,7 +91,7 @@ export async function POST(request: Request) {
           userId: session?.user.id
         }
       });
-      return tx.order.create({
+      const createdOrder = await tx.order.create({
         data: {
           orderNumber,
           userId: session?.user.id,
@@ -84,7 +105,7 @@ export async function POST(request: Request) {
           shipping: totals.shipping,
           gst: totals.gst,
           total: totals.total,
-          couponCode: parsed.data.couponCode?.toUpperCase(),
+          couponCode: appliedCouponCode,
           items: {
             create: [
               ...enrichedItems.map(({ product, variant, quantity }) => ({
@@ -109,11 +130,34 @@ export async function POST(request: Request) {
           }
         }
       });
+      if (loyaltyCustomerId) {
+        const claimed = await tx.$executeRaw`
+          UPDATE "LoyaltyCustomer"
+          SET "rewardRedeemedAt" = CURRENT_TIMESTAMP, "rewardOrderNumber" = ${orderNumber}
+          WHERE "id" = ${loyaltyCustomerId} AND "rewardCode" = ${enteredCoupon} AND "rewardRedeemedAt" IS NULL
+        `;
+        if (claimed !== 1) throw new Error("Loyalty reward was already redeemed.");
+      }
+      return createdOrder;
     });
   } catch (error) {
     const code = getDatabaseErrorCode(error);
-    console.error(`Could not save order ${orderNumber}`, { code });
-    return NextResponse.json({ error: "We could not save your order. Please try again later or contact support." }, { status: 503 });
+    console.error(`Could not save order ${orderNumber}`, error);
+    const rewardWasJustUsed = error instanceof Error && error.message === "Loyalty reward was already redeemed.";
+    const schemaNeedsUpdate = code === "P2021" || code === "P2022";
+    const catalogNeedsSync = code === "P2003";
+    const developmentHint = process.env.NODE_ENV === "development"
+      ? ` (database error: ${code ?? (error instanceof Error ? error.name : "unknown")})`
+      : "";
+    return NextResponse.json({
+      error: rewardWasJustUsed
+        ? "This scratch card code was just used in another order. Apply a different code to continue."
+        : schemaNeedsUpdate
+        ? "Checkout is temporarily unavailable while the store database is updated. Please try again later or contact support."
+        : catalogNeedsSync
+          ? "The store catalog is being updated. Please try again shortly or contact support."
+          : `We could not save your order. Please try again later or contact support.${developmentHint}`
+    }, { status: rewardWasJustUsed ? 409 : 503 });
   }
 
   if (order.paymentMethod === "RAZORPAY") {

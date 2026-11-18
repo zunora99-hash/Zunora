@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { BarChart3, Boxes, Inbox, LayoutDashboard, ShoppingCart, Tags, Users } from "lucide-react";
+import { BadgePercent, BarChart3, Boxes, Inbox, LayoutDashboard, ShoppingCart, Tags, Users } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { createMetadata } from "@/lib/seo";
 import { getServerSession } from "next-auth";
@@ -14,6 +14,7 @@ const nav = [
   { href: "/admin/products", label: "Products", icon: Boxes },
   { href: "/admin?tab=orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin?tab=customers", label: "Customers", icon: Users },
+  { href: "/admin/loyalty", label: "Loyalty rewards", icon: BadgePercent },
   { href: "/admin?tab=coupons", label: "Coupons", icon: Tags },
   { href: "/admin?tab=messages", label: "Messages", icon: Inbox },
   { href: "/admin?tab=reports", label: "Reports", icon: BarChart3 }

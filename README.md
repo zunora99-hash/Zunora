@@ -28,7 +28,7 @@ npm install
 Copy-Item .env.example .env
 ```
 
-3. Edit `.env` and set `DATABASE_URL` to a PostgreSQL database that exists, set a private random `NEXTAUTH_SECRET`, and set `NEXTAUTH_URL` to the URL and port the app uses (for example, `http://localhost:3001`).
+3. Edit `.env` and set `DATABASE_URL` to a PostgreSQL database that exists, set a private random `NEXTAUTH_SECRET`, and set `NEXTAUTH_URL` to the URL and port the app uses (for example, `http://localhost:3000`).
 
 For Vercel, set `NEXTAUTH_URL` to the exact public site origin (for example, `https://your-project.vercel.app`, with no path or port), and set it in the same deployment environment as the site. Do not use a localhost URL in Vercel. Redeploy after changing environment variables.
 
@@ -38,9 +38,9 @@ Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in the same environment as the
 
 `<NEXTAUTH_URL>/api/auth/callback/google`
 
-The URI must use the same scheme, hostname, and port as `NEXTAUTH_URL`. Add every environment you use to the same Google OAuth client; local and production redirect URIs can both be registered. For the local `.env` example using port 3001, add `http://localhost:3001/api/auth/callback/google`. For production on Vercel, this app uses the stable `VERCEL_PROJECT_PRODUCTION_URL` host so OAuth does not use a deployment-specific preview URL; add `https://zunora.vercel.app/api/auth/callback/google` for the current production domain. The deployed `GOOGLE_CLIENT_ID` must belong to this same OAuth client. Save the Google OAuth client settings, then restart locally or redeploy after changing environment variables.
+The URI must use the same scheme, hostname, and port as `NEXTAUTH_URL`. Add every environment you use to the same Google OAuth client; local and production redirect URIs can both be registered. For the local `.env` example using port 3000, add `http://localhost:3000/api/auth/callback/google`. For production on Vercel, this app uses the stable `VERCEL_PROJECT_PRODUCTION_URL` host so OAuth does not use a deployment-specific preview URL; add `https://zunora.vercel.app/api/auth/callback/google` for the current production domain. The deployed `GOOGLE_CLIENT_ID` must belong to this same OAuth client. Save the Google OAuth client settings, then restart locally or redeploy after changing environment variables.
 
-Checkout's map pin coordinates are stored with the delivery address. The additive SQL change is in `prisma/manual-migrations/20261113_add_address_coordinates.sql`; apply it to the target database before deploying code that writes coordinates. The production database has legacy objects not represented in the Prisma schema, so review `prisma migrate diff` before using `db:push` against it; a blind push would drop those objects.
+Checkout's map pin coordinates are stored with the delivery address. The additive SQL change is in `prisma/manual-migrations/20261113_add_address_coordinates.sql`; apply it to the target database before deploying code that writes coordinates. The one-use loyalty reward adds the `LoyaltyCustomer` table with `prisma/manual-migrations/20261118_loyalty_rewards.sql`; apply this additive migration before deploying the reward feature. Scratch card codes add the optional `rewardCode` column with `prisma/manual-migrations/20261119_loyalty_scratch_codes.sql`; apply it before enabling code registration. The production database has legacy objects not represented in the Prisma schema, so review `prisma migrate diff` before using `db:push` against it; a blind push would drop those objects.
 
 4. Create the database if needed, then generate Prisma and push the schema:
 
@@ -105,6 +105,7 @@ All replaceable brand values live in [config/site.ts](config/site.ts):
 ## Production notes
 
 - Use managed PostgreSQL for `DATABASE_URL`.
+- Supabase Postgres works with this Prisma app. For Vercel/serverless runtime, set `DATABASE_URL` to the Supabase transaction-pooler connection string (port 6543, with `pgbouncer=true`) and `DIRECT_URL` to the session-pooler or direct connection string (port 5432) for schema commands. Set both in the hosting provider; do not commit either URL. A new Supabase database still needs the Prisma schema, reviewed SQL migrations, and the catalog seed before checkout can save orders.
 - Set `NEXT_PUBLIC_SITE_URL` to your public canonical HTTPS domain (for example, `https://www.example.com`) in Vercel so canonical links, structured data, and the sitemap point to the production site.
 - After deploying catalog changes, run `npm run db:seed` with `DATABASE_URL` set to the Render database. This upserts the new 30 g jar SKUs, 25 g cashew SKUs, and the 15 g zero-price gift SKU; it preserves existing order items, reviews, and on-hand variant stock. New SKUs start with the stock configured in `lib/catalog.ts` and should be checked against physical inventory before accepting orders.
 - Verify the production domain as a Domain property in Google Search Console, submit `https://zunora.vercel.app/sitemap.xml`, and inspect/request indexing for the home page, `/dry-fruits-belgaum`, the shop page, and each product URL. The code publishes a sitemap and `robots.txt` already references it. A sitemap is a crawl hint, not an indexing or ranking guarantee.
@@ -138,7 +139,7 @@ This path needs a Linux VPS with a public IPv4 address, Docker Compose, a domain
    - Google OAuth, Razorpay, SMTP/EmailJS, and Cloudinary values only for services you have enabled. Add `https://your-domain.com/api/auth/callback/google` to the Google OAuth client's authorized redirect URIs.
 
    Never commit `.env.production` or paste production credentials into a README or example file. If any credential from an example file has ever been used for a real service, rotate it with that provider before deploying.
-3. Build the image and prepare the database. Only for a brand-new, empty database, apply the schema with `docker compose build web` followed by `docker compose run --rm web npx prisma db push`. For an existing production database, back it up, review additive SQL, and apply it with `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/manual-migrations/20261114_backend_security.sql`; also apply `20261113_add_address_coordinates.sql` if those columns are not already present. Do not blindly run `prisma db push` against a database with legacy objects. Seed catalog data only after reviewing what the seed updates (`docker compose run --rm web npm run db:seed`).
+3. Build the image and prepare the database. Only for a brand-new, empty database, apply the schema with `docker compose build web` followed by `docker compose run --rm web npx prisma db push`. For an existing production database, back it up, review additive SQL, and apply it with `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f prisma/manual-migrations/20261114_backend_security.sql`; also apply `20261113_add_address_coordinates.sql` if those columns are not already present and `20261118_loyalty_rewards.sql` for the loyalty table and `20261119_loyalty_scratch_codes.sql` for unique scratch codes. Do not blindly run `prisma db push` against a database with legacy objects. Seed catalog data only after reviewing what the seed updates (`docker compose run --rm web npm run db:seed`).
 4. Build and start the app:
 
    ```bash

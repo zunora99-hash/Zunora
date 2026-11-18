@@ -7,6 +7,7 @@ export default function PrivacyPage() {
     "We collect information needed to process orders, provide support, prevent fraud, and improve the store experience.",
     "If Google Analytics is configured, it is only activated after you accept analytics cookies. Google may use cookies and receive usage information such as pages viewed and basic browser/device data. You can reject analytics or change your choice later using Cookie settings.",
     "Payment details are handled by payment providers such as Razorpay and are not stored on Zunora servers.",
+    "If you register for a loyalty reward, we store your name and mobile number to prevent duplicate registrations and link the one-time scratch card code to your reward record.",
     "You can request correction or deletion of account data by contacting support. Some order records may be retained for tax and compliance requirements."
   ]} />;
 }
