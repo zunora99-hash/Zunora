@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Facebook, Instagram, MessageCircle, Send } from "lucide-react";
+import { Facebook, Instagram, Send } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,7 +66,10 @@ export function Footer() {
         className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-olive text-white shadow-soft md:bottom-6"
         aria-label="Order on WhatsApp"
       >
-        <MessageCircle className="h-5 w-5" />
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none">
+          <path d="M20.2 11.6a8.2 8.2 0 0 1-12.1 7.2L4 20l1.3-4a8.2 8.2 0 1 1 14.9-4.4Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M8.1 7.7c.2-.4.5-.5.8-.5h.6c.2 0 .4.1.5.4l.7 1.6c.1.2.1.4-.1.6l-.5.6c-.2.2-.3.3-.1.6.2.4.8 1.3 1.6 2 .8.7 1.5.9 1.8 1 .2.1.4.1.6-.1l.8-.8c.2-.2.4-.2.6-.1l1.5.7c.2.1.3.3.2.5-.1.4-.4 1-.8 1.3-.4.4-1 .6-1.6.6s-1.5-.2-2.7-.8c-1.2-.6-2.3-1.5-3.2-2.6-.8-1-1.4-2.2-1.6-3-.2-.8-.1-1.4.3-2Z" fill="currentColor" />
+        </svg>
       </Link>
     </footer>
   );
