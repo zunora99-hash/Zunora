@@ -9,7 +9,7 @@ import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
   title: "Dry Fruits in Belagavi (Belgaum) | Zunora",
-  description: "Shop dry fruits online from Zunora in Belagavi (Belgaum), Karnataka. Explore 30 g cashew jars for ₹59 and 25 g snack packs in three flavours.",
+  description: "Shop dry fruits online from Zunora in Belagavi (Belgaum), Karnataka. Explore 30 g cashew jars for ₹65, free delivery over ₹130, and a free gift with three jars.",
   path: "/",
   image: "/products/zunora-salted-cashew-jar-30g.webp",
   keywords: ["dry fruits in Belagavi", "dry fruits in Belgaum", "buy dry fruits online Belagavi", "Zunora dry fruits", "cashews Belagavi"]
@@ -28,7 +28,7 @@ export default function HomePage() {
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#e7bf72]">New · 30 g jars</p>
               <h2 className="mt-2 font-serif text-3xl font-bold md:text-4xl">Cashew favourites, jarred.</h2>
-              <p className="mt-2 max-w-2xl text-sm text-white/75">Choose from four Zunora cashew jar flavours, each ₹59.</p>
+              <p className="mt-2 max-w-2xl text-sm text-white/75">Choose from four Zunora cashew jar flavours, each ₹65.</p>
             </div>
             <Button variant="outline" asChild className="w-fit border-white/40 text-white hover:bg-white/10 hover:text-white">
               <Link href="/shop?category=cashews">Shop all cashews <ArrowRight className="h-4 w-4" /></Link>
@@ -119,8 +119,8 @@ export default function HomePage() {
             </div>
             <div>
               <p className="eyebrow flex items-center gap-2"><Gift className="h-4 w-4" /> Limited-time gift</p>
-              <h2 className="mt-3 font-serif text-4xl font-bold">A little extra in every cashew pack.</h2>
-              <p className="mt-4 text-muted-foreground">Add a Zunora 25 g cashew pack and receive one 15 g Pista & Cashew Mix free. The gift is added automatically at checkout, one per eligible pack, during this limited-time offer.</p>
+              <h2 className="mt-3 font-serif text-4xl font-bold">A little extra with three jars.</h2>
+              <p className="mt-4 text-muted-foreground">Order any three Zunora 30 g cashew jars and receive one 15 g Pista & Cashew Mix free. The gift is added automatically at checkout.</p>
               <Button className="mt-6" asChild>
                 <Link href="/shop?category=cashews">Shop cashew packs <ArrowRight className="h-4 w-4" /></Link>
               </Button>
@@ -132,14 +132,14 @@ export default function HomePage() {
         <div className="container">
           <p className="eyebrow text-center">Shop with confidence</p>
           <h2 className="mt-2 text-center font-serif text-4xl font-bold">Clear packs. Simple prices.</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">Choose 25 g snack packs from ₹40 or 30 g jars for ₹59. Review each product package for ingredients, allergens, and nutrition information before consuming.</p>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-muted-foreground">Choose 25 g snack packs from ₹40 or 30 g jars for ₹65. Get free delivery above ₹130 and one free Pista & Cashew Mix with any three jars. Review product packages for ingredients, allergens, and nutrition information.</p>
         </div>
       </section>
       <section className="section">
         <div className="container grid gap-5 md:grid-cols-2">
           {[
-            ["Which cashew products can I buy?", "Zunora offers four 30 g cashew jar flavours for ₹59 each, plus Salted, Peri Peri Masala, and Raw & Natural 25 g snack packs for ₹40 each."],
-            ["How does the free gift work?", "One 15 g Pista & Cashew Mix is added automatically for each eligible 25 g cashew pack during this limited-time offer."],
+            ["Which cashew products can I buy?", "Zunora offers four 30 g cashew jar flavours for ₹65 each, plus Salted, Peri Peri Masala, and Raw & Natural 25 g snack packs for ₹40 each."],
+            ["How does the free gift work?", "One 15 g Pista & Cashew Mix is added automatically when you order any three cashew jars."],
             ["Are almonds available?", "Zunora almonds are coming soon."],
             ["Where can I check ingredients and allergens?", "Please read the information printed on each product package."]
           ].map(([question, answer]) => (

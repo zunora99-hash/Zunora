@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CatalogProduct, CatalogVariant } from "@/lib/catalog";
+import { products, type CatalogProduct, type CatalogVariant } from "@/lib/catalog";
 
 export type CartItem = {
   productId: string;
@@ -87,7 +87,26 @@ export const useCartStore = create<CartState>()(
       clear: () => set({ items: [] }),
       setDrawerOpen: (drawerOpen) => set({ drawerOpen })
     }),
-    { name: "nutrinest-cart" }
+    {
+      name: "nutrinest-cart",
+      version: 2,
+      migrate: (persistedState, version) => {
+        const state = persistedState as CartState;
+        if (version < 2) {
+          return {
+            ...state,
+            items: state.items.map((item) => {
+              const product = products.find((entry) => entry.id === item.productId);
+              const variant = product?.variants.find((entry) => entry.id === item.variantId);
+              return product && variant
+                ? { ...item, name: product.name, slug: product.slug, image: product.images[0], variant: variant.label, price: variant.price, mrp: variant.mrp }
+                : item;
+            })
+          };
+        }
+        return state;
+      }
+    }
   )
 );
 

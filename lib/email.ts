@@ -310,3 +310,41 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
     html: `<p>We received a request to reset your ${escapeHtml(siteConfig.name)} password.</p><p><a href="${safeUrl}">Reset password</a></p><p>This link expires in 30 minutes. If you did not request this, ignore this email.</p>`
   });
 }
+
+async function sendStoreEmail(to: string, subject: string, text: string, html: string) {
+  const host = process.env.SMTP_HOST?.trim();
+  const user = process.env.SMTP_USER?.trim();
+  const password = process.env.SMTP_PASS?.trim();
+  const from = process.env.SMTP_FROM?.trim();
+  const port = Number(process.env.SMTP_PORT ?? 587);
+  if (!host || !user || !password || !from || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error("Store email is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and SMTP_FROM.");
+  }
+  const normalizedPassword = host.toLowerCase() === "smtp.gmail.com" ? password.replace(/\s/g, "") : password;
+  const transporter = nodemailer.createTransport({ host, port, secure: port === 465, auth: { user, pass: normalizedPassword } });
+  await transporter.sendMail({ from: `${siteConfig.name} <${from}>`, to, subject, text, html });
+}
+
+export async function sendAdminOrderNotification(input: {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  total: number;
+  paymentMethod: string;
+  items: Array<{ name: string; variant: string; quantity: number }>;
+}) {
+  const to = process.env.ADMIN_ORDER_EMAIL?.trim() || "zunora99@gmail.com";
+  const items = input.items.map((item) => `${item.name} (${item.variant}) x ${item.quantity}`).join("\n");
+  const safeItems = input.items.map((item) => `<li>${escapeHtml(item.name)} (${escapeHtml(item.variant)}) × ${item.quantity}</li>`).join("");
+  const subject = `New Zunora order ${input.orderNumber}`;
+  const text = `A new order was placed.\nOrder: ${input.orderNumber}\nCustomer: ${input.customerName} <${input.customerEmail}>\nPayment: ${input.paymentMethod}\nTotal: ${formatCurrency(input.total)}\n\n${items}`;
+  const html = `<h2>New Zunora order</h2><p><strong>Order:</strong> ${escapeHtml(input.orderNumber)}</p><p><strong>Customer:</strong> ${escapeHtml(input.customerName)} &lt;${escapeHtml(input.customerEmail)}&gt;</p><p><strong>Payment:</strong> ${escapeHtml(input.paymentMethod)}</p><p><strong>Total:</strong> ${formatCurrency(input.total)}</p><ul>${safeItems}</ul>`;
+  await sendStoreEmail(to, subject, text, html);
+}
+
+export async function sendDeliveryStatusEmail(input: { to: string; customerName: string; orderNumber: string }) {
+  const subject = `${siteConfig.name} order ${input.orderNumber} has been delivered`;
+  const text = `Hi ${input.customerName}, your Zunora order ${input.orderNumber} has been marked as delivered. Thank you for shopping with us.`;
+  const html = `<p>Hi ${escapeHtml(input.customerName)},</p><p>Your Zunora order <strong>${escapeHtml(input.orderNumber)}</strong> has been marked as delivered.</p><p>Thank you for shopping with us.</p>`;
+  await sendStoreEmail(input.to, subject, text, html);
+}

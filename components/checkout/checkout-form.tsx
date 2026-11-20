@@ -409,7 +409,7 @@ export function CheckoutForm() {
               <Image src={freeGiftProduct.images[0]} alt={freeGiftProduct.name} width={56} height={56} className="h-14 w-14 rounded-md object-cover" />
               <div>
                 <p className="text-sm font-semibold">{freeGiftProduct.name}</p>
-                <p className="text-xs text-muted-foreground">Free gift · {freeGiftQuantity} pack{freeGiftQuantity === 1 ? "" : "s"}</p>
+                <p className="text-xs text-muted-foreground">Free with 3 or more cashew jars</p>
               </div>
               <p className="text-sm font-semibold text-olive">FREE</p>
             </div>
@@ -421,7 +421,7 @@ export function CheckoutForm() {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">Scratch card codes must be used with the mobile number entered above.</p>
         {couponApplied ? <p className="mt-2 text-sm font-medium text-olive">{couponPercent}% discount applied. Discounts cannot be combined.</p> : null}
-        <p className="mt-3 text-xs text-muted-foreground">Orders of ₹100 or more get free delivery. Orders below ₹100 have a ₹25 delivery charge.</p>
+        <p className="mt-3 text-xs text-muted-foreground">Orders of ₹130 or more get free delivery. Orders below ₹130 have a ₹30 delivery charge.</p>
         <div className="mt-5 grid gap-2 border-t pt-5 text-sm">
           <SummaryLine label="Subtotal" value={totals.subtotal} />
           <SummaryLine label="Discount" value={-totals.discount} />

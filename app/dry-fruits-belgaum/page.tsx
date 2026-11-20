@@ -8,7 +8,7 @@ import { absoluteUrl } from "@/lib/utils";
 
 export const metadata = createMetadata({
   title: "Buy Dry Fruits Online in Belagavi & Belgaum | Zunora",
-  description: "Order dry fruits online from Zunora in Belagavi (Belgaum), Karnataka. Shop 30 g cashew jars for ₹59, 25 g snack packs, and delivery information.",
+  description: "Order dry fruits online from Zunora in Belagavi (Belgaum), Karnataka. Shop 30 g cashew jars for ₹65, 25 g snack packs, and free delivery on orders above ₹130.",
   path: "/dry-fruits-belgaum",
   image: "/products/zunora-salted-cashew-jar-30g.webp",
   keywords: ["dry fruits shop Belagavi", "dry fruits delivery Belagavi", "buy dry fruits online Belgaum", "cashews Belagavi", "Zunora"]
@@ -52,7 +52,7 @@ export default function BelagaviDryFruitsPage() {
           <p className="eyebrow">Available online</p>
           <h2 className="mt-2 font-serif text-4xl font-bold">Zunora cashew jars and 25 g packs</h2>
           <p className="mt-3 max-w-3xl text-muted-foreground">
-            Zunora 30 g cashew jars are ₹59 each, and 25 g snack packs are ₹40 each. During the current offer, one 15 g Pista & Cashew Mix is added free for each eligible 25 g pack at checkout. Check each package for ingredients, allergens, and nutrition information.
+            Zunora 30 g cashew jars are ₹65 each, and 25 g snack packs are ₹40 each. Order any three jars to receive one free 15 g Pista & Cashew Mix. Check each package for ingredients, allergens, and nutrition information.
           </p>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
@@ -66,7 +66,7 @@ export default function BelagaviDryFruitsPage() {
             <p className="eyebrow">Ordering and delivery</p>
             <h2 className="mt-2 font-serif text-3xl font-bold">Order online for Belagavi delivery</h2>
             <p className="mt-4 text-muted-foreground">
-              Add the packs you want to your cart and enter your delivery address at checkout. Delivery is free for orders of ₹100 or more; orders below ₹100 have a ₹25 delivery charge. Available payment methods are shown at checkout.
+              Add the products you want to your cart and enter your delivery address at checkout. Delivery is free for orders of ₹130 or more; orders below ₹130 have a ₹30 delivery charge. Available payment methods are shown at checkout.
             </p>
             <p className="mt-4 text-muted-foreground">
               The store currently focuses on cashews in jars and compact snack packs. Other dry fruit ranges will be listed here when they become available.
@@ -81,11 +81,11 @@ export default function BelagaviDryFruitsPage() {
               </details>
               <details className="rounded-lg border bg-card p-4">
                 <summary className="cursor-pointer font-semibold">What dry fruits can I order now?</summary>
-                <p className="mt-2 text-sm text-muted-foreground">Zunora offers 30 g Cashew Nuts, Salted Cashew, Peri Peri Masala Cashew, and Pudina Cashew Mix jars for ₹59 each, plus 25 g Salted, Peri Peri Masala, and Raw & Natural cashew packs for ₹40 each.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Zunora offers 30 g Cashew Nuts, Salted Cashew, Peri Peri Masala Cashew, and Pudina Cashew Mix jars for ₹65 each, plus 25 g Salted, Peri Peri Masala, and Raw & Natural cashew packs for ₹40 each.</p>
               </details>
               <details className="rounded-lg border bg-card p-4">
                 <summary className="cursor-pointer font-semibold">How much does delivery cost?</summary>
-                <p className="mt-2 text-sm text-muted-foreground">Delivery is free at ₹100 or more and ₹25 for orders below ₹100. The final amount, including applicable GST, is shown at checkout.</p>
+                <p className="mt-2 text-sm text-muted-foreground">Delivery is free at ₹130 or more and ₹30 for orders below ₹130. The final amount, including applicable GST, is shown at checkout.</p>
               </details>
             </div>
           </div>

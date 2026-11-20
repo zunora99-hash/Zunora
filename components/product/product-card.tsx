@@ -25,9 +25,8 @@ export function ProductCard({ product, index = 0 }: { product: CatalogProduct; i
     >
       <Link href={`/product/${product.slug}`} className="block">
         <div className="relative aspect-[2/3] overflow-hidden bg-[#f8efe0]">
-          <Image src={product.images[0]} alt={`${product.name} pack`} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-contain transition duration-500 group-hover:scale-[1.02]" />
+          <Image src={product.images[0]} alt={product.imageAlts?.[0] ?? `${product.name} pack`} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-contain transition duration-500 group-hover:scale-[1.02]" />
           {product.featured ? <Badge className="absolute left-3 top-3">{product.tags.includes("jar") ? "New" : "Available now"}</Badge> : null}
-          {product.tags.includes("interactive-3d") ? <Badge className="absolute right-3 top-3 bg-cacao text-white">3D view</Badge> : null}
         </div>
       </Link>
       <div className="p-4">
@@ -35,7 +34,7 @@ export function ProductCard({ product, index = 0 }: { product: CatalogProduct; i
           <p className="text-xs font-semibold uppercase text-olive">{product.category}</p>
           {product.reviewCount > 0 ? <span className="text-xs font-semibold">{product.rating} / 5 · {product.reviewCount} reviews</span> : null}
         </div>
-        <Link href={`/product/${product.slug}`} className="mt-2 block min-h-12 font-serif text-xl font-semibold leading-tight hover:underline">
+        <Link href={`/product/${product.slug}`} className="mt-2 block min-h-12 font-serif text-xl font-semibold leading-tight text-black hover:underline">
           {product.name}
         </Link>
         <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{product.shortDescription}</p>

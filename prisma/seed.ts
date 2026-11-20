@@ -51,8 +51,8 @@ async function main() {
         origin: product.origin,
         featured: product.featured,
         categoryId: category.id,
-        metaTitle: `${product.name} Online`,
-        metaDescription: product.shortDescription
+        metaTitle: product.metaTitle ?? `${product.name} Online`,
+        metaDescription: product.metaDescription ?? product.shortDescription
       },
       create: {
         name: product.name,
@@ -68,8 +68,8 @@ async function main() {
         origin: product.origin,
         featured: product.featured,
         categoryId: category.id,
-        metaTitle: `${product.name} Online`,
-        metaDescription: product.shortDescription
+        metaTitle: product.metaTitle ?? `${product.name} Online`,
+        metaDescription: product.metaDescription ?? product.shortDescription
       }
     });
 

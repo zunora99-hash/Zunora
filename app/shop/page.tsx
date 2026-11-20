@@ -8,7 +8,7 @@ import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
   title: "Shop Zunora Dry Fruits in Belagavi | Cashew Jars & Packs",
-  description: "Order Zunora cashew jars and snack packs online in Belagavi (Belgaum) and across India. Shop 30 g jars for ₹59 and 25 g packs from ₹40.",
+  description: "Order Zunora cashew jars and snack packs online in Belagavi (Belgaum) and across India. Shop 30 g jars for ₹65, 25 g packs from ₹40, and free delivery above ₹130.",
   path: "/shop",
   image: "/products/zunora-salted-cashew-jar-30g.webp",
   keywords: ["buy cashews online", "dry fruits Belagavi", "dry fruits Belgaum", "Zunora cashew packs", "25 g cashew"]
@@ -37,7 +37,7 @@ export default function ShopPage({ searchParams }: { searchParams: ShopParams })
         <div>
           <p className="eyebrow">Shop</p>
           <h1 className="mt-2 font-serif text-5xl font-bold">Shop Zunora cashews</h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">Order online from Belagavi (Belgaum) or elsewhere in India. Explore four 30 g jar flavours for ₹59 each and 25 g snack packs from ₹40. The current free gift offer applies to eligible 25 g packs.</p>
+          <p className="mt-3 max-w-2xl text-muted-foreground">Order online from Belagavi (Belgaum) or elsewhere in India. Explore four 30 g jar flavours for ₹65 each and 25 g snack packs from ₹40. Get one free 15 g Pista & Cashew Mix with any three jars.</p>
         </div>
         <p className="text-sm font-semibold text-muted-foreground">{selected.length} products</p>
       </div>

@@ -42,9 +42,9 @@ export function ProductActions({ product }: { product: CatalogProduct }) {
       ) : (
         <p className="text-sm font-semibold">{selected.label} {product.tags.includes("jar") ? "jar" : "pack"}</p>
       )}
-      {product.eligibleForFreeGift ? (
+      {product.tags.includes("jar") ? (
         <p className="mt-3 rounded-md bg-olive/5 p-3 text-sm text-olive">
-          Limited-time offer: one free 15 g Pista & Cashew Mix with each pack, added automatically at checkout.
+          Order any 3 cashew jars and get one free 15 g Pista & Cashew Mix, added automatically at checkout.
         </p>
       ) : null}
       <div className="mt-5 flex items-center justify-between">

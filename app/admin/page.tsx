@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/auth";
 import { RevenueChart } from "@/components/admin/revenue-chart";
+import { OrderStatusList } from "@/components/admin/order-status-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
@@ -128,38 +129,18 @@ export default async function AdminDashboardPage() {
       </div>
       <Card className="mt-6">
         <CardHeader><CardTitle>Recent orders</CardTitle></CardHeader>
-        <CardContent className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="text-muted-foreground">
-              <tr><th className="py-3">Order</th><th>Customer email</th><th>Order</th><th>Payment</th><th>Items</th><th>Total</th><th>Delivery pin</th><th>Date</th></tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((order) => (
-                <tr key={order.orderNumber} className="border-t">
-                  <td className="py-3 font-semibold">{order.orderNumber}</td>
-                  <td>{order.email}</td>
-                  <td>{order.status}</td>
-                  <td>{order.paymentStatus}</td>
-                  <td>{order._count.items}</td>
-                  <td>{formatPrice(order.total)}</td>
-                  <td>
-                    {order.address.latitude !== null && order.address.longitude !== null ? (
-                      <a
-                        href={`https://www.openstreetmap.org/?mlat=${order.address.latitude}&mlon=${order.address.longitude}#map=18/${order.address.latitude}/${order.address.longitude}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary underline"
-                      >
-                        Open map
-                      </a>
-                    ) : "—"}
-                  </td>
-                  <td>{order.createdAt.toLocaleDateString("en-IN")}</td>
-                </tr>
-              ))}
-              {!recentOrders.length ? <tr><td colSpan={8} className="py-8 text-center text-muted-foreground">No orders yet. Orders will appear here after checkout.</td></tr> : null}
-            </tbody>
-          </table>
+        <CardContent className="p-3 sm:p-6">
+          <OrderStatusList orders={recentOrders.map((order) => ({
+            orderNumber: order.orderNumber,
+            email: order.email,
+            status: order.status,
+            paymentStatus: order.paymentStatus,
+            total: order.total,
+            createdAt: order.createdAt.toISOString(),
+            itemCount: order._count.items,
+            latitude: order.address.latitude,
+            longitude: order.address.longitude
+          }))} />
         </CardContent>
       </Card>
     </div>

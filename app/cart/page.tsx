@@ -23,7 +23,7 @@ export default function CartPage() {
             {freeGiftProduct && freeGiftQuantity > 0 ? (
               <div className="flex items-center gap-4 rounded-lg border border-olive/30 bg-olive/5 p-4">
                 <Image src={freeGiftProduct.images[0]} alt={freeGiftProduct.name} width={64} height={64} className="h-16 w-16 rounded-md object-cover" />
-                <p className="text-sm"><strong>{freeGiftQuantity} free 15 g Pista & Cashew Mix</strong> will be added to your order at checkout.</p>
+                <p className="text-sm"><strong>One free 15 g Pista & Cashew Mix</strong> is added with 3 or more cashew jars.</p>
               </div>
             ) : null}
             {items.map((item) => (
@@ -55,7 +55,7 @@ export default function CartPage() {
               <span className="text-muted-foreground">Delivery</span>
               <span className="font-semibold">{getDeliveryCharge(totals.subtotal) === 0 ? "Free" : formatPrice(getDeliveryCharge(totals.subtotal))}</span>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">Free delivery on orders of ₹100 or more. Orders below ₹100 have a ₹25 delivery charge. GST and coupons are calculated at checkout.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Free delivery on orders of ₹130 or more. Orders below ₹130 have a ₹30 delivery charge. GST and coupons are calculated at checkout.</p>
             <Button className="mt-5 w-full" asChild><Link href="/checkout">Checkout</Link></Button>
           </aside>
         </div>

@@ -42,7 +42,7 @@ export function CartDrawer() {
               <div className="grid gap-4">
                 {freeGiftProduct && freeGiftQuantity > 0 ? (
                   <p className="rounded-md border border-olive/30 bg-olive/5 p-3 text-sm text-olive">
-                    {freeGiftQuantity} free 15 g Pista & Cashew Mix added at checkout.
+                    One free 15 g Pista & Cashew Mix added for your 3+ cashew jars.
                   </p>
                 ) : null}
                 {items.map((item) => (
@@ -99,7 +99,7 @@ export function CartDrawer() {
                 <span className="font-semibold">{getDeliveryCharge(totals.subtotal) === 0 ? "Free" : formatPrice(getDeliveryCharge(totals.subtotal))}</span>
               </div>
             ) : null}
-            <p className="mb-4 text-xs text-muted-foreground">Free delivery on orders of ₹100 or more; ₹25 delivery below ₹100.</p>
+            <p className="mb-4 text-xs text-muted-foreground">Free delivery on orders of ₹130 or more; ₹30 delivery below ₹130.</p>
             <Button className="w-full" asChild disabled={!items.length} onClick={() => setDrawerOpen(false)}>
               <Link href="/checkout">Checkout</Link>
             </Button>

@@ -9,8 +9,8 @@ import { siteConfig } from "@/config/site";
 
 const trustItems = [
   { label: "25 g packs · ₹40 each", icon: PackageCheck },
-  { label: "30 g jars · ₹59 each", icon: Sparkles },
-  { label: "Free 15 g mix with each pack", icon: Gift }
+  { label: "30 g jars · ₹65 each", icon: Sparkles },
+  { label: "Free 15 g mix with any 3 jars", icon: Gift }
 ];
 
 export function Hero() {
@@ -29,7 +29,7 @@ export function Hero() {
             Dry fruits in Belagavi, made memorable.
           </h1>
           <p className="mt-5 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
-            Discover Zunora cashews in 30 g jars and 25 g snack packs. Choose from four jar flavours, each ₹59, or get a free 15 g Pista & Cashew Mix with each eligible snack pack.
+            Discover Zunora cashews in 30 g jars and 25 g snack packs. Jars are ₹65 each, and an order of any three jars includes one free 15 g Pista & Cashew Mix.
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" asChild>
@@ -58,13 +58,13 @@ export function Hero() {
             <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_58%,rgba(255,255,255,0.9),transparent_55%),linear-gradient(145deg,rgba(255,255,255,0.72),rgba(214,183,126,0.24))]" />
             <div aria-hidden="true" className="absolute inset-x-[12%] bottom-[8%] h-[16%] rounded-[50%] bg-[#9b7448]/20 blur-2xl" />
             <div className="product-layer product-layer-left absolute left-[2%] top-[13%] h-[79%] w-[36%] [transform:perspective(900px)_rotateY(10deg)_rotateZ(-5deg)]">
-              <Image src="/products/zunora-raw-cashew-25g.png" alt="Zunora Raw & Natural Cashew 25 g pack" fill priority sizes="(min-width: 768px) 18vw, 36vw" className="object-contain drop-shadow-[0_25px_18px_rgba(61,38,24,0.2)]" />
+              <Image src="/products/hero-raw-cashew.png" alt="Zunora Raw & Natural Cashew 25 g pack" fill priority sizes="(min-width: 768px) 18vw, 36vw" className="object-contain drop-shadow-[0_25px_18px_rgba(61,38,24,0.2)]" />
             </div>
             <div className="product-layer product-layer-center absolute left-[29%] top-[3%] z-10 h-[94%] w-[42%] [transform:perspective(900px)_translateZ(50px)]">
-              <Image src="/products/zunora-salted-cashew-25g.png" alt="Zunora Salted Cashew 25 g pack" fill priority sizes="(min-width: 768px) 22vw, 42vw" className="object-contain drop-shadow-[0_35px_22px_rgba(61,38,24,0.28)]" />
+              <Image src="/products/hero-salted-cashew.png" alt="Zunora Salted Cashew 25 g pack" fill priority sizes="(min-width: 768px) 22vw, 42vw" className="object-contain drop-shadow-[0_35px_22px_rgba(61,38,24,0.28)]" />
             </div>
             <div className="product-layer product-layer-right absolute right-[2%] top-[13%] h-[79%] w-[36%] [transform:perspective(900px)_rotateY(-10deg)_rotateZ(5deg)]">
-              <Image src="/products/zunora-pista-cashew-mix-15g.png" alt="Zunora Pista & Cashew Mix 15 g pack" fill priority sizes="(min-width: 768px) 18vw, 36vw" className="object-contain drop-shadow-[0_25px_18px_rgba(61,38,24,0.2)]" />
+              <Image src="/products/hero-pista-cashew.png" alt="Zunora Pista & Cashew Mix 15 g pack" fill priority sizes="(min-width: 768px) 18vw, 36vw" className="object-contain drop-shadow-[0_25px_18px_rgba(61,38,24,0.2)]" />
             </div>
           </div>
           <div className="absolute -bottom-4 left-2 z-20 rounded-2xl border border-white/70 bg-white/75 px-4 py-3 shadow-[0_18px_45px_-22px_rgba(61,38,24,0.35)] backdrop-blur-xl sm:-left-5 sm:bottom-8">

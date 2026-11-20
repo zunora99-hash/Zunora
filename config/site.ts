@@ -34,8 +34,8 @@ export const  siteConfig = {
     x: "https://x.com/nutrinest"
   },
   shipping: {
-    freeAbove: 100,
-    flatFee: 25,
+    freeAbove: 130,
+    flatFee: 30,
     gstRate: 0.05
   }
 } as const;

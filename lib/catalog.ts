@@ -17,13 +17,15 @@ export type CatalogProduct = {
   categorySlug: string;
   description: string;
   shortDescription: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  imageAlts?: string[];
   images: string[];
   video?: string;
   rating: number;
   reviewCount: number;
   featured: boolean;
   availableForSale: boolean;
-  eligibleForFreeGift?: boolean;
   freeGiftOnly?: boolean;
   tags: string[];
   nutrition: Record<string, string>;
@@ -149,13 +151,15 @@ const launchProducts: CatalogProduct[] = [
     categorySlug: "cashews",
     description: "A 25 g pack of Zunora Salted Cashew. The supplied pack design describes these cashews as dry roasted, not fried. Check the package for ingredient, allergen, and nutrition details.",
     shortDescription: "Salted, dry-roasted cashew snack in a handy 25 g pack.",
+    metaTitle: "Salted Cashew Pack 25 g | Zunora Belagavi",
+    metaDescription: "Try Zunora salted cashews in a handy 25 g pack. Dry-roasted cashews with a light salted flavour. Order online in Belagavi and across India.",
+    imageAlts: ["Zunora Salted Cashew 25 g snack pack"],
     images: ["/products/zunora-salted-cashew-25g.png"],
     video: "/products/zunora-salted-cashew-25g.mp4",
     rating: 0,
     reviewCount: 0,
     featured: true,
     availableForSale: true,
-    eligibleForFreeGift: true,
     tags: ["cashews", "salted", "25g"],
     nutrition: {},
     ingredients: "Refer to the product packaging.",
@@ -170,13 +174,15 @@ const launchProducts: CatalogProduct[] = [
     categorySlug: "cashews",
     description: "A 25 g pack of Zunora Peri Peri Masala Cashew. The supplied pack design describes these cashews as dry roasted, not fried. Check the package for ingredient, allergen, and nutrition details.",
     shortDescription: "A bold peri peri masala cashew snack in a 25 g pack.",
+    metaTitle: "Peri Peri Cashew Pack 25 g | Zunora Belagavi",
+    metaDescription: "Enjoy Zunora Peri Peri Masala Cashews in a 25 g snack pack. A boldly seasoned cashew snack to enjoy at home or on the go. Order online from Belagavi.",
+    imageAlts: ["Zunora Peri Peri Masala Cashew 25 g snack pack"],
     images: ["/products/zunora-peri-peri-cashew-25g.png"],
     video: "/products/zunora-peri-peri-cashew-25g.mp4",
     rating: 0,
     reviewCount: 0,
     featured: true,
     availableForSale: true,
-    eligibleForFreeGift: true,
     tags: ["cashews", "peri-peri", "25g"],
     nutrition: {},
     ingredients: "Refer to the product packaging.",
@@ -191,13 +197,15 @@ const launchProducts: CatalogProduct[] = [
     categorySlug: "cashews",
     description: "A 25 g pack of Zunora Raw & Natural Cashew. Check the package for ingredient, allergen, and nutrition details.",
     shortDescription: "Raw and natural cashews in a handy 25 g pack.",
+    metaTitle: "Raw Cashew Pack 25 g | Zunora Belagavi",
+    metaDescription: "Choose Zunora Raw & Natural Cashews in a convenient 25 g pack. A simple cashew snack for home, work or travel. Order online in Belagavi and India.",
+    imageAlts: ["Zunora Raw and Natural Cashew 25 g snack pack"],
     images: ["/products/zunora-raw-cashew-25g.png"],
     video: "/products/zunora-raw-cashew-25g.mp4",
     rating: 0,
     reviewCount: 0,
     featured: true,
     availableForSale: true,
-    eligibleForFreeGift: true,
     tags: ["cashews", "raw", "25g"],
     nutrition: {},
     ingredients: "Refer to the product packaging.",
@@ -210,8 +218,11 @@ const launchProducts: CatalogProduct[] = [
     slug: "zunora-pista-cashew-mix-15g-gift",
     category: "Cashews",
     categorySlug: "cashews",
-    description: "A 15 g Pista & Cashew Mix included free with each eligible Zunora 25 g cashew pack during this limited-time offer. Not sold separately as part of this offer.",
-    shortDescription: "Free 15 g mix gift with each eligible 25 g cashew pack during the offer.",
+    description: "One 15 g Pista & Cashew Mix is included free with an order of three or more Zunora 30 g cashew jars. Added automatically at checkout; not sold separately as part of this offer.",
+    shortDescription: "One free 15 g Pista & Cashew Mix with any three Zunora cashew jars.",
+    metaTitle: "Pista and Cashew Mix 15 g Gift | Zunora",
+    metaDescription: "Get one complimentary 15 g Zunora Pista & Cashew Mix when you order three or more 30 g cashew jars. Added automatically at checkout; not sold separately.",
+    imageAlts: ["Zunora Pista and Cashew Mix 15 g complimentary gift pack"],
     images: ["/products/zunora-pista-cashew-mix-15g.png"],
     video: "/products/zunora-pista-cashew-mix-15g.mp4",
     rating: 0,
@@ -228,24 +239,28 @@ const launchProducts: CatalogProduct[] = [
 ];
 
 function createJarProduct(slug: string, name: string, image: string, shortDescription: string, productDetails: string): CatalogProduct {
+  const flavour = name.replace(/^Zunora /, "").replace(/ Jar \(30 g\)$/, "");
   return {
     id: `prod_${slug.replace(/-/g, "_")}`,
     name,
     slug,
     category: "Cashews",
     categorySlug: "cashews",
-    description: `Zunora ${name}: ${productDetails} Read the package for ingredient, allergen, and nutrition information.`,
+    description: `${productDetails} Read the package for ingredient, allergen, and nutrition information.`,
     shortDescription,
+    metaTitle: `${flavour} Jar 30 g | Zunora Belagavi`,
+    metaDescription: `Shop the Zunora ${flavour} Jar in a handy 30 g size. Enjoy a convenient cashew snack at home or on the go. Order online in Belagavi.`,
+    imageAlts: [`Zunora ${flavour} 30 g jar`],
     images: [image],
     rating: 0,
     reviewCount: 0,
     featured: true,
     availableForSale: true,
-    tags: ["cashews", "30g", "jar", "interactive-3d"],
+    tags: ["cashews", "30g", "jar"],
     nutrition: {},
     ingredients: "Refer to the product packaging.",
     origin: "Refer to the product packaging.",
-    variants: [{ id: `${slug}-30g-jar`, label: "30g", weightG: 30, price: 59, mrp: 59, stock: 50 }]
+    variants: [{ id: `${slug}-30g-jar`, label: "30g", weightG: 30, price: 65, mrp: 65, stock: 50 }]
   };
 }
 
@@ -261,10 +276,11 @@ export const storefrontProducts = products.filter((product) => product.available
 export const freeGiftProduct = products.find((product) => product.freeGiftOnly);
 
 export function getFreeGiftQuantity(items: Array<{ productId: string; quantity: number }>) {
-  return items.reduce((total, item) => {
+  const jarQuantity = items.reduce((total, item) => {
     const product = storefrontProducts.find((entry) => entry.id === item.productId);
-    return total + (product?.eligibleForFreeGift ? item.quantity : 0);
+    return total + (product?.tags.includes("jar") ? item.quantity : 0);
   }, 0);
+  return jarQuantity >= 3 ? 1 : 0;
 }
 
 export function getProductBySlug(slug: string) {

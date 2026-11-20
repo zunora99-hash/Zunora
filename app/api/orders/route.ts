@@ -6,6 +6,7 @@ import { freeGiftProduct, getFreeGiftQuantity, products, type CatalogProduct, ty
 import { calculateTotals } from "@/lib/pricing";
 import { getRazorpayClient } from "@/lib/razorpay";
 import { sendOrderConfirmationForOrder } from "@/lib/order-notifications";
+import { sendAdminOrderNotification } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { checkoutSchema } from "@/lib/validations";
 import { enforceRateLimit } from "@/lib/rate-limit";
@@ -158,6 +159,25 @@ export async function POST(request: Request) {
           ? "The store catalog is being updated. Please try again shortly or contact support."
           : `We could not save your order. Please try again later or contact support.${developmentHint}`
     }, { status: rewardWasJustUsed ? 409 : 503 });
+  }
+
+  try {
+    const notificationOrder = await prisma.order.findUnique({
+      where: { orderNumber: order.orderNumber },
+      include: { address: { select: { name: true } }, items: { select: { name: true, variant: true, quantity: true } } }
+    });
+    if (notificationOrder) {
+      await sendAdminOrderNotification({
+        orderNumber: notificationOrder.orderNumber,
+        customerName: notificationOrder.address.name,
+        customerEmail: notificationOrder.email,
+        total: notificationOrder.total,
+        paymentMethod: notificationOrder.paymentMethod,
+        items: notificationOrder.items
+      });
+    }
+  } catch (error) {
+    console.error(`Admin order notification failed for ${order.orderNumber}`, error);
   }
 
   if (order.paymentMethod === "RAZORPAY") {

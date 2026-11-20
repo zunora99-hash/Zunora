@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: `${siteConfig.name} | ${siteConfig.tagline}`,
     template: "%s"
   },
-  description: "Shop Zunora cashew jars and snack packs online in Belagavi (Belgaum) and across India. Explore 30 g jars for ₹59 and 25 g packs from ₹40.",
+  description: "Shop Zunora cashew jars and snack packs online in Belagavi (Belgaum) and across India. Explore 30 g jars for ₹65, free delivery above ₹130, and a free gift with three jars.",
   applicationName: siteConfig.name,
   icons: { icon: "/favicon.svg" }
 };
